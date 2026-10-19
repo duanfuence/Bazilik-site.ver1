@@ -1,0 +1,238 @@
+---
+/**
+ * Горизонтальная лента-коллаж: кадры разного размера и смещения,
+ * листаются пальцем, колесом с Shift, клавишами ← → (когда лента в фокусе) или кнопками.
+ * Прокручивается только лента — страница в ширину не «едет».
+ */
+import Photo from './Photo.astro';
+import { formatPrice, type MenuItem } from '../data/menu';
+
+interface Props {
+  id: string;
+  label: string;
+  items: (MenuItem & { kicker?: string })[];
+}
+
+const { id, label, items } = Astro.props;
+
+// Ритм коллажа повторяется каждые 5 кадров: высокий, малый ниже, широкий, узкий, квадрат.
+const variants = [
+  { v: 'a', ratio: '4/5' },
+  { v: 'b', ratio: '1/1' },
+  { v: 'c', ratio: '3/2' },
+  { v: 'd', ratio: '3/4' },
+  { v: 'e', ratio: '1/1' },
+];
+const trackId = `strip-${id}`;
+---
+
+<div class="strip" data-strip>
+  <div class="strip__bar wrap">
+    <p class="strip__hint muted" aria-hidden="true">Листайте вправо</p>
+    <div class="strip__controls">
+      <span class="strip__progress" aria-hidden="true"><span data-strip-progress></span></span>
+      <button class="strip__btn" type="button" data-strip-prev aria-controls={trackId} disabled>
+        <span aria-hidden="true">←</span><span class="visually-hidden">Предыдущие позиции: {label}</span>
+      </button>
+      <button class="strip__btn" type="button" data-strip-next aria-controls={trackId}>
+        <span aria-hidden="true">→</span><span class="visually-hidden">Следующие позиции: {label}</span>
+      </button>
+    </div>
+  </div>
+
+  <ul class="strip__track" id={trackId} tabindex="0" role="list" aria-label={`${label}: лента, листается по горизонтали`} data-strip-track>
+    {
+      items.map((item, i) => {
+        const { v, ratio } = variants[i % variants.length];
+        return (
+          <li class={`strip__item strip__item--${v}`}>
+            <article>
+              <Photo
+                photo={{ src: item.photo, alt: item.name, brief: `Фото: ${item.name.toLowerCase()}`, ratio, tone: item.tone ?? 'clay' }}
+                sizes="(min-width: 1024px) 30vw, 75vw"
+              />
+              <div class="strip__meta">
+                <p class="strip__num label muted">
+                  {item.kicker ?? String(i + 1).padStart(2, '0')}
+                  {item.demo && <span class="demo-tag">демо</span>}
+                </p>
+                <h3 class="strip__name">{item.name}</h3>
+                {item.description && <p class="strip__desc">{item.description}</p>}
+                <p class="strip__price">
+                  <span>{formatPrice(item.price)}</span>
+                  {item.portion && <span class="muted">{item.portion}</span>}
+                </p>
+              </div>
+            </article>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>
+
+<style>
+  .strip {
+    --inset: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter)));
+    position: relative;
+  }
+  .strip__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .strip__hint {
+    font-size: 0.8125rem;
+  }
+  .strip__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .strip__progress {
+    position: relative;
+    width: clamp(4rem, 10vw, 9rem);
+    height: 1px;
+    margin-right: 0.75rem;
+    background: var(--line-strong);
+  }
+  .strip__progress span {
+    position: absolute;
+    inset: -0.5px auto -0.5px 0;
+    width: 100%;
+    background: currentColor;
+    transform-origin: left;
+    transform: scaleX(var(--p, 0.15));
+    transition: transform var(--dur-1) linear;
+  }
+  .strip__btn {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    font-size: 1.1rem;
+    transition:
+      background-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease),
+      border-color var(--dur-1) var(--ease);
+  }
+  .strip__btn:hover:not(:disabled) {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .strip__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  :global(.on-dark) .strip__btn {
+    border-color: currentColor;
+  }
+  :global(.on-dark) .strip__btn:hover:not(:disabled) {
+    background: var(--on-olive);
+    color: var(--olive);
+  }
+
+  .strip__track {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem var(--inset) 1.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--inset);
+    scrollbar-width: none;
+  }
+  .strip__track::-webkit-scrollbar {
+    display: none;
+  }
+  .strip__track:focus-visible {
+    outline-offset: -2px;
+  }
+  .strip__item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+  /* Ширины и смещения — ритм коллажа */
+  .strip__item--a { width: clamp(15rem, 68vw, 26rem); }
+  .strip__item--b { width: clamp(12rem, 52vw, 19rem); margin-top: clamp(2.5rem, 6vw, 6rem); }
+  .strip__item--c { width: clamp(17rem, 80vw, 34rem); margin-top: clamp(1rem, 2vw, 2rem); }
+  .strip__item--d { width: clamp(13rem, 58vw, 21rem); margin-top: clamp(4rem, 9vw, 9rem); }
+  .strip__item--e { width: clamp(12rem, 50vw, 18rem); }
+
+  .strip__meta {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.9rem;
+    max-width: 30rem;
+  }
+  .strip__num {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .strip__name {
+    font-size: clamp(1.35rem, 1.15rem + 0.7vw, 1.8rem);
+    line-height: 1.1;
+  }
+  .strip__desc {
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  :global(.on-dark) .strip__desc {
+    color: var(--on-olive-2);
+  }
+  .strip__price {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .strip__price .muted {
+    font-weight: 400;
+    font-size: 0.8125rem;
+  }
+</style>
+
+<script>
+  for (const strip of document.querySelectorAll<HTMLElement>('[data-strip]')) {
+    const track = strip.querySelector<HTMLElement>('[data-strip-track]')!;
+    const prev = strip.querySelector<HTMLButtonElement>('[data-strip-prev]')!;
+    const next = strip.querySelector<HTMLButtonElement>('[data-strip-next]')!;
+    const bar = strip.querySelector<HTMLElement>('[data-strip-progress]')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      const visible = track.clientWidth / track.scrollWidth;
+      const p = max > 0 ? track.scrollLeft / max : 1;
+      bar.style.setProperty('--p', String(Math.min(1, visible + p * (1 - visible))));
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= max - 2;
+    };
+
+    const page = (dir: 1 | -1) =>
+      track.scrollBy({ left: dir * track.clientWidth * 0.75, behavior: reduce.matches ? 'auto' : 'smooth' });
+
+    prev.addEventListener('click', () => page(-1));
+    next.addEventListener('click', () => page(1));
+    track.addEventListener('scroll', update, { passive: true });
+    track.addEventListener('keydown', (e) => {
+      if (e.target !== track) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); page(1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); page(-1); }
+    });
+    new ResizeObserver(update).observe(track);
+    update();
+  }
+</script>

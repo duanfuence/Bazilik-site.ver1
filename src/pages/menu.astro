@@ -1,0 +1,202 @@
+---
+import Base from '../layouts/Base.astro';
+import PageIntro from '../components/PageIntro.astro';
+import MenuStrip from '../components/MenuStrip.astro';
+import MenuList from '../components/MenuList.astro';
+import { menu, menuIsDemo } from '../data/menu';
+import { site } from '../config/site';
+---
+
+<Base
+  title="Меню"
+  description="Меню ресторана «Базилик» в Тамбове: закуски, салаты, супы, горячее, десерты от шефа-кондитера и напитки. Цены и выход блюд."
+>
+  <PageIntro label="Меню">
+    <Fragment slot="title">Меню <span class="accent">ресторана</span></Fragment>
+    <p>Разделы с фотографиями листаются вправо — пальцем, кнопками или стрелками на клавиатуре. Состав, аллергены и замену ингредиентов уточнит официант.</p>
+  </PageIntro>
+
+  {
+    menuIsDemo && (
+      <div class="wrap">
+        <p class="notice notice--info demo-banner" role="note">
+          <strong>Меню на сайте наполняется.</strong>
+          <span>
+            Сейчас здесь демонстрационные позиции без цен — они помечены «демо». Актуальное меню и цены — по телефону{' '}
+            <a href={`tel:${site.phone.tel}`}>{site.phone.local}</a>.
+          </span>
+        </p>
+      </div>
+    )
+  }
+
+  <nav class="catnav" aria-label="Разделы меню" data-catnav>
+    <div class="wrap">
+      <ul class="catnav__list">
+        {
+          menu.map((c, i) => (
+            <li>
+              <a href={`#${c.id}`} data-cat-link={c.id}>
+                <span class="catnav__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                {c.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+
+  {
+    menu.map((c, i) => (
+      <section class:list={['cat', `cat--${c.layout}`]} id={c.id} aria-labelledby={`${c.id}-title`} data-cat>
+        <div class="wrap cat__head">
+          <p class="cat__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+          <h2 id={`${c.id}-title`} class="h2 cat__title">{c.title}</h2>
+          {c.note && <p class="cat__note accent">{c.note}</p>}
+        </div>
+        {c.layout === 'gallery' ? (
+          <MenuStrip id={c.id} label={c.title} items={c.items} />
+        ) : (
+          <div class="wrap">
+            <MenuList items={c.items} />
+          </div>
+        )}
+      </section>
+    ))
+  }
+
+  <section class="wrap menu-end">
+    <p class="h2">Выбрали? <span class="accent">Забронируйте стол</span></p>
+    <a class="btn" href="/bron">Оставить заявку</a>
+  </section>
+</Base>
+
+<style>
+  .demo-banner {
+    max-width: 52rem;
+    margin-bottom: var(--space-4);
+  }
+  .demo-banner a {
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Липкая навигация по разделам: на телефоне листается по горизонтали */
+  .catnav {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 30;
+    background-color: var(--paper);
+    border-block: 1px solid var(--line);
+  }
+  .catnav .wrap {
+    padding-inline: 0;
+  }
+  .catnav__list {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem var(--gutter);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .catnav__list::-webkit-scrollbar {
+    display: none;
+  }
+  .catnav a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    align-items: center;
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius);
+    white-space: nowrap;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition:
+      background-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease);
+  }
+  .catnav a:hover {
+    background: var(--paper-2);
+  }
+  .catnav a[aria-current='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .catnav__num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+
+  .cat {
+    padding-top: var(--space-5);
+    scroll-margin-top: calc(var(--header-h) + 3.75rem);
+  }
+  .cat__head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 1.25rem;
+    margin-bottom: var(--space-4);
+  }
+  .cat__num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.2rem, 1rem + 1vw, 2rem);
+    color: var(--tomato);
+  }
+  .cat__note {
+    grid-column: 2;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+  }
+  .cat--gallery .cat__head {
+    margin-bottom: 1rem;
+  }
+  .menu-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line-strong);
+  }
+</style>
+
+<script>
+  // Подсветка текущего раздела в навигации и прокрутка самой навигации к нему
+  const links = new Map<string, HTMLAnchorElement>();
+  document.querySelectorAll<HTMLAnchorElement>('[data-cat-link]').forEach((a) => links.set(a.dataset.catLink!, a));
+  const list = document.querySelector<HTMLElement>('.catnav__list');
+  let current = '';
+
+  const setCurrent = (id: string) => {
+    if (id === current) return;
+    current = id;
+    links.forEach((a, key) => {
+      if (key === id) {
+        a.setAttribute('aria-current', 'true');
+        if (list) list.scrollTo({ left: a.offsetLeft - 16, behavior: 'smooth' });
+      } else a.removeAttribute('aria-current');
+    });
+  };
+
+  const sections = [...document.querySelectorAll<HTMLElement>('[data-cat]')];
+  const onScroll = () => {
+    const line = window.innerHeight * 0.3;
+    let active = sections[0]?.id ?? '';
+    for (const s of sections) if (s.getBoundingClientRect().top <= line) active = s.id;
+    setCurrent(active);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

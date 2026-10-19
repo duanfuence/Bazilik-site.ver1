@@ -1,0 +1,401 @@
+@import './tokens.css';
+
+/* ---------- Сброс ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+body {
+  min-height: 100dvh;
+  background-color: var(--paper);
+  /* Едва заметная фактура бумаги */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .11 0 0 0 0 .09 0 0 0 0 .07 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-feature-settings: 'kern', 'liga';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip; /* страховка от случайной горизонтальной прокрутки */
+}
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+img {
+  height: auto;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+:where(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: var(--lh-head);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+p {
+  text-wrap: pretty;
+}
+::selection {
+  background: var(--tomato);
+  color: var(--on-tomato);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- Фокус ---------- */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.on-dark :focus-visible,
+.on-tomato :focus-visible {
+  outline-color: currentColor;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0.75rem;
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Раскладка ---------- */
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+}
+.section {
+  padding-block: var(--space-6);
+}
+.section--tight {
+  padding-block: var(--space-5);
+}
+.on-dark {
+  background-color: var(--olive);
+  color: var(--on-olive);
+}
+.on-tomato {
+  background-color: var(--tomato);
+  color: var(--on-tomato);
+}
+.on-paper-2 {
+  background-color: var(--paper-2);
+}
+
+/* ---------- Типографика ---------- */
+.label {
+  font-family: var(--font-text);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+.muted {
+  color: var(--ink-3);
+}
+.on-dark .muted {
+  color: var(--on-olive-2);
+}
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  max-width: var(--measure);
+}
+.prose {
+  max-width: var(--measure);
+}
+.prose > * + * {
+  margin-top: 1em;
+}
+.h-mega {
+  font-size: var(--fs-mega);
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+}
+.h-display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.025em;
+}
+.h1 {
+  font-size: var(--fs-h1);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+}
+.h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.15;
+}
+/* Курсивный акцент в заголовках — «рукописная пометка» */
+.accent {
+  font-style: italic;
+  color: var(--tomato);
+}
+.on-dark .accent {
+  color: var(--sage);
+}
+.on-tomato .accent {
+  color: inherit;
+}
+
+/* Индекс раздела: «01 — Кухня» с линейкой */
+.index {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line-strong);
+  justify-self: stretch;
+  width: 100%;
+}
+.on-dark .index,
+.on-tomato .index {
+  border-top-color: currentColor;
+}
+.index__num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ---------- Ссылки и кнопки ---------- */
+.btn {
+  --btn-bg: var(--tomato);
+  --btn-fg: var(--on-tomato);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.6rem;
+  border: 1px solid var(--btn-bg);
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.btn:hover {
+  --btn-bg: var(--tomato-hover);
+}
+.btn:active {
+  --btn-bg: var(--tomato-press);
+}
+.btn[disabled],
+.btn[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn--ink {
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+}
+.btn--ink:hover,
+.btn--ink:active {
+  --btn-bg: #000;
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+.btn--ghost:hover {
+  border-color: var(--ink);
+  background: rgb(29 25 21 / 0.04);
+}
+.on-dark .btn--ghost,
+.on-tomato .btn--ghost {
+  color: inherit;
+  border-color: currentColor;
+}
+.on-dark .btn--ghost:hover,
+.on-tomato .btn--ghost:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+.on-tomato .btn--paper {
+  --btn-bg: var(--paper);
+  --btn-fg: var(--tomato-press);
+}
+.on-tomato .btn--paper:hover {
+  --btn-bg: #fff;
+}
+.btn--block {
+  width: 100%;
+}
+
+/* Ссылка со стрелкой: подчёркивание растёт при наведении */
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-weight: 500;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 0.15em;
+  transition: background-size var(--dur-2) var(--ease);
+}
+.arrow-link::after {
+  content: '→';
+  transition: transform var(--dur-2) var(--ease);
+}
+.arrow-link:hover {
+  background-size: 100% 1px;
+}
+.arrow-link:hover::after {
+  transform: translateX(0.25em);
+}
+
+/* ---------- Появление при прокрутке ---------- */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity var(--dur-3) var(--ease),
+    transform var(--dur-3) var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js [data-reveal].is-in,
+.reveal-all [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Пометка временного контента */
+.demo-tag {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--tomato);
+  border-radius: var(--radius);
+  color: var(--tomato);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+}
+.on-dark .demo-tag {
+  border-color: var(--sage);
+  color: var(--sage);
+}
+.placeholder-note {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.6rem 0.85rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+.on-dark .placeholder-note {
+  border-color: rgb(239 232 218 / 0.4);
+  color: var(--on-olive-2);
+}
+
+/* Уведомления */
+.notice {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.15rem;
+  border-left: 3px solid currentColor;
+  font-size: 0.95rem;
+}
+.notice[hidden] {
+  display: none;
+}
+.notice--error {
+  background: var(--error-bg);
+  color: var(--error);
+}
+.notice--error p {
+  color: var(--ink);
+}
+.notice--info {
+  background: var(--paper-2);
+  color: var(--ink-2);
+  border-color: var(--ink-3);
+}
+

@@ -1,0 +1,146 @@
+---
+import '../styles/forms.css';
+import Base from '../layouts/Base.astro';
+import BookingForm from '../components/BookingForm.astro';
+import HoursTable from '../components/HoursTable.astro';
+import OpenStatus from '../components/OpenStatus.astro';
+import { site } from '../config/site';
+---
+
+<Base
+  title="Бронирование стола"
+  description="Забронируйте стол в ресторане «Базилик» в Тамбове: выберите дату, время и число гостей. Администратор перезвонит и подтвердит бронь. Телефон 55-82-53."
+  hideMobileBooking
+>
+  <div class="wrap booking">
+    <aside class="booking__aside">
+      <p class="index label"><span class="index__num">—</span> Бронирование</p>
+      <h1 class="h1 booking__title">Стол <span class="accent">на ваше время</span></h1>
+
+      <ol class="steps">
+        <li><span class="steps__n">1</span><p><strong>Вы оставляете заявку</strong> — дата, время, число гостей.</p></li>
+        <li><span class="steps__n">2</span><p><strong>Администратор перезванивает</strong> и уточняет детали.</p></li>
+        <li><span class="steps__n">3</span><p><strong>Бронь подтверждена</strong> — только после звонка.</p></li>
+      </ol>
+
+      <div class="booking__call">
+        <p class="label muted">Быстрее по телефону</p>
+        <a class="booking__phone" href={`tel:${site.phone.tel}`}>{site.phone.local}</a>
+        <OpenStatus class="booking__status" />
+      </div>
+
+      <div class="booking__hours">
+        <p class="label muted">Часы работы</p>
+        <HoursTable />
+      </div>
+
+      <p class="booking__more muted">
+        Компания больше {site.booking.maxGuests} человек или праздник? <a href="/bankety">Заявка на банкет</a>
+      </p>
+    </aside>
+
+    <div class="booking__form">
+      <h2 class="visually-hidden">Заявка на бронирование</h2>
+      <BookingForm />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .booking {
+    display: grid;
+    gap: var(--space-4) var(--col-gap);
+    padding-block: 1.25rem var(--space-6);
+  }
+  @media (min-width: 1024px) {
+    .booking {
+      grid-template-columns: 5fr 1fr 6fr;
+    }
+    .booking__aside {
+      grid-column: 1;
+      position: sticky;
+      top: calc(var(--header-h) + 1.25rem);
+      align-self: start;
+    }
+    .booking__form {
+      grid-column: 3;
+      padding-top: 3.25rem;
+    }
+  }
+  .booking__aside {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+  }
+  .booking__title {
+    font-size: clamp(2.6rem, 1.8rem + 3.4vw, 5rem);
+  }
+  .steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+    max-width: 30rem;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+  .steps__n {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--tomato);
+  }
+  .steps strong {
+    font-weight: 500;
+  }
+  .booking__call {
+    display: grid;
+    gap: 0.35rem;
+    justify-items: start;
+  }
+  .booking__phone {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    line-height: 1;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .booking__phone:hover {
+    color: var(--tomato);
+  }
+  .booking__status {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .booking__hours {
+    max-width: 24rem;
+  }
+  .booking__more {
+    font-size: var(--fs-small);
+  }
+  /* На телефоне сначала форма, контакты — ниже */
+  @media (max-width: 1023px) {
+    .booking__call,
+    .booking__hours,
+    .booking__more {
+      order: 3;
+    }
+    .booking__aside {
+      display: contents;
+    }
+    .booking__form {
+      order: 2;
+    }
+    .steps {
+      order: 1;
+    }
+    .booking__aside > .index,
+    .booking__title {
+      order: 0;
+    }
+  }
+</style>

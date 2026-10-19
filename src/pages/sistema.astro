@@ -1,0 +1,174 @@
+---
+/** Живая дизайн-система: токены и компоненты в одном месте. Закрыта от индексации, в навигацию не входит. */
+import '../styles/forms.css';
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import Logo from '../components/Logo.astro';
+import type { Tone } from '../data/photos';
+
+const colors = [
+  ['--paper', 'Бумага', 'основной фон'],
+  ['--paper-2', 'Бумага 2', 'полосы, второстепенный фон'],
+  ['--paper-3', 'Бумага 3', 'плашки, заглушки'],
+  ['--ink', 'Чернила', 'текст, 15:1'],
+  ['--ink-2', 'Чернила 2', 'вторичный текст, 8.5:1'],
+  ['--ink-3', 'Чернила 3', 'подписи, 5.2:1'],
+  ['--tomato', 'Томат', 'действия и акценты, 5.3:1'],
+  ['--tomato-hover', 'Томат · наведение', ''],
+  ['--olive', 'Базиликовое масло', 'тёмные разделы'],
+  ['--sage', 'Шалфей', 'акцент на тёмном, 7:1'],
+  ['--error', 'Ошибка', 'вместе с иконкой и текстом'],
+  ['--success', 'Успех', 'подтверждения'],
+];
+const tones: Tone[] = ['paper', 'clay', 'olive', 'tomato', 'ink'];
+const type = [
+  ['h-mega', 'Мега — словесный знак', 'Базилик'],
+  ['h-display', 'Дисплей — заголовок раздела', 'Кухня в деталях'],
+  ['h1', 'H1 — заголовок страницы', 'Стол на ваше время'],
+  ['h2', 'H2', 'Как это устроено'],
+  ['h3', 'H3', 'Заявка получена'],
+  ['lead', 'Лид — Onest', 'Ресторан в Тамбове с кухней шефа Александра Боярского.'],
+  ['', 'Текст — Onest 17/1.6', 'Основной текст набран Onest: открытые формы, хорошая кириллица, цифры одинаковой ширины.'],
+  ['label', 'Метка — Onest 12, разрядка 0.14em', 'Часы работы'],
+];
+---
+
+<Base title="Дизайн-система" description="Дизайн-система сайта ресторана «Базилик»." noindex>
+  <div class="wrap ds">
+    <p class="index label"><span class="index__num">—</span> Служебная страница</p>
+    <h1 class="h1">Дизайн-<span class="accent">система</span></h1>
+    <p class="lead">Концепция «Тетрадь шефа»: тёплая бумага, чернила и томатный акцент. Редакционная сетка на 12 колонок, нумерованные разделы, тонкие линейки, подписи к кадрам как в печатном меню. Токены — в <code>src/styles/tokens.css</code>.</p>
+
+    <section class="ds__section">
+      <h2 class="h3">Логотип</h2>
+      <div class="ds__row">
+        <Logo size="lg" />
+        <span class="on-dark ds__pad"><Logo size="lg" /></span>
+        <span class="on-tomato ds__pad"><Logo size="lg" /></span>
+      </div>
+    </section>
+
+    <section class="ds__section">
+      <h2 class="h3">Цвет</h2>
+      <ul class="ds__swatches">
+        {colors.map(([v, n, d]) => (
+          <li><span class="ds__chip" style={`background:var(${v})`}></span><strong>{n}</strong><code>{v}</code><span class="muted">{d}</span></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="ds__section">
+      <h2 class="h3">Типографика</h2>
+      <p class="muted">Заголовки — Bona Nova (кириллица, каллиграфичный курсив для акцентов). Текст — Onest Variable. Размеры адаптивные (clamp).</p>
+      <ul class="ds__type">
+        {type.map(([cls, n, sample]) => (<li><span class="label muted">{n}</span><p class={cls}>{sample}</p></li>))}
+      </ul>
+      <p class="h2">Заголовок с <span class="accent">курсивным акцентом</span></p>
+      <p class="index label"><span class="index__num">01</span> Индекс раздела</p>
+    </section>
+
+    <section class="ds__section">
+      <h2 class="h3">Кнопки и ссылки</h2>
+      <div class="ds__row">
+        <a class="btn" href="#">Основное действие</a>
+        <a class="btn btn--ink" href="#">Второе действие</a>
+        <a class="btn btn--ghost" href="#">Контурная</a>
+        <button class="btn" disabled>Недоступна</button>
+        <a class="arrow-link" href="#">Ссылка со стрелкой</a>
+      </div>
+      <div class="ds__row on-tomato ds__pad">
+        <a class="btn btn--paper" href="#">На томате</a>
+        <a class="btn btn--ghost" href="#">Контурная</a>
+      </div>
+    </section>
+
+    <section class="ds__section">
+      <h2 class="h3">Формы</h2>
+      <div class="ds__forms">
+        <div class="field"><label class="field__label" for="ds1">Поле</label><input class="input" id="ds1" placeholder="Подсказка" /></div>
+        <div class="field has-error"><label class="field__label" for="ds2">Поле с ошибкой</label><input class="input" id="ds2" value="123" aria-invalid="true" aria-describedby="ds2e" /><p class="field__error" id="ds2e">Проверьте номер: нужно 10 цифр после +7.</p></div>
+        <div class="chips"><label class="chip"><input type="radio" name="ds" checked /><span>19:00</span></label><label class="chip"><input type="radio" name="ds" /><span>19:30</span></label><label class="chip"><input type="radio" name="ds" /><span>Завтра<small>21 окт</small></span></label></div>
+        <div class="notice notice--error"><strong>Заявка не отправлена</strong><p>Сообщение об ошибке с понятным следующим шагом.</p></div>
+      </div>
+    </section>
+
+    <section class="ds__section">
+      <h2 class="h3">Фотография</h2>
+      <p class="muted prose">Тёплый естественный или вечерний свет, глубокие тени без пересвета, тёплый баланс белого. Блюда — сверху или с уровня стола. Люди — в движении, без позирования. Пропорции: 4:5 и 3:4 (портреты, блюда), 1:1 (детали), 3:2 и 16:9 (зал). Пока снимков нет, заглушка показывает бриф кадра — это готовый список для фотографа (<code>src/data/photos.ts</code>).</p>
+      <div class="ds__photos">
+        {tones.map((t) => <Photo photo={{ brief: `Тон «${t}»`, ratio: '4/5', tone: t, alt: '' }} sizes="20vw" />)}
+      </div>
+    </section>
+
+    <section class="ds__section">
+      <h2 class="h3">Движение</h2>
+      <p class="prose">Только функциональные анимации: появление блоков при прокрутке (700 мс, без параллакса), подчёркивание ссылок, раскрытие навигации. При <code>prefers-reduced-motion</code> всё движение отключается.</p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .ds {
+    display: grid;
+    gap: 2rem;
+    padding-block: 1.25rem var(--space-6);
+  }
+  .ds__section {
+    display: grid;
+    gap: 1.25rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line-strong);
+  }
+  .ds__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+  .ds__pad {
+    padding: 1rem 1.25rem;
+  }
+  .ds__swatches {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: 1.25rem;
+  }
+  .ds__swatches li {
+    display: grid;
+    gap: 0.2rem;
+    font-size: 0.875rem;
+  }
+  .ds__chip {
+    height: 4.5rem;
+    border: 1px solid var(--line);
+    margin-bottom: 0.4rem;
+  }
+  .ds__type {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+  }
+  .ds__type li {
+    display: grid;
+    gap: 0.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+    overflow-wrap: anywhere;
+  }
+  .ds__forms {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 32rem;
+  }
+  .ds__photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: 1rem;
+  }
+  code {
+    font-size: 0.85em;
+  }
+</style>

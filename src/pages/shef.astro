@@ -1,0 +1,212 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import { chef } from '../data/chef';
+---
+
+<Base
+  title="Шеф-повар Александр Боярский"
+  description="Александр Боярский — шеф-повар ресторана «Базилик» в Тамбове. Первое место в номинации «Лучший кондитер России», победы на региональных кулинарных чемпионатах, судейство."
+>
+  <article class="chef-page on-dark">
+    <div class="wrap chef-hero">
+      <p class="index label chef-hero__index"><span class="index__num">—</span> Шеф-повар</p>
+      <h1 class="h-mega chef-hero__name">
+        <span>Александр</span>
+        <span class="accent">Боярский</span>
+      </h1>
+      <Photo name="chefPortrait" class="chef-hero__portrait" priority sizes="(min-width: 1024px) 34vw, 90vw" />
+      <div class="chef-hero__lead">
+        <p class="lead">{chef.role}. Повар и кондитер, чьи работы отмечены на российских и региональных кулинарных конкурсах.</p>
+      </div>
+    </div>
+
+    <section class="wrap awards" aria-labelledby="awards-title">
+      <h2 id="awards-title" class="label awards__label">Награды</h2>
+      <ol class="awards__list">
+        {
+          chef.achievements.map((a, i) => (
+            <li class="awards__item" data-reveal style={`--reveal-delay:${i * 100}ms`}>
+              <span class="awards__mark">{a.mark}</span>
+              <span class="awards__title">{a.title}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="wrap practice" aria-labelledby="practice-title">
+      <Photo name="chefWork" class="practice__photo" sizes="(min-width: 1024px) 30vw, 80vw" />
+      <div class="practice__text">
+        <h2 id="practice-title" class="h2">Опыт <span class="accent">за пределами кухни</span></h2>
+        <ul class="practice__list">
+          {chef.experience.map((e) => <li>{e}</li>)}
+        </ul>
+        {
+          chef.quote ? (
+            <blockquote class="practice__quote"><p>«{chef.quote}»</p></blockquote>
+          ) : (
+            <p class="placeholder-note">Здесь будет короткая цитата шефа о его кухне — её нужно записать с ним лично.</p>
+          )
+        }
+      </div>
+      <Photo name="chefDetail" class="practice__detail" sizes="(min-width: 1024px) 22vw, 50vw" />
+      <Photo name="chefJudge" class="practice__judge" sizes="(min-width: 1024px) 36vw, 90vw" />
+    </section>
+  </article>
+
+  <section class="section section--tight wrap chef-cta">
+    <p class="h2">Попробовать кухню шефа</p>
+    <div class="chef-cta__actions">
+      <a class="btn" href="/bron">Забронировать стол</a>
+      <a class="arrow-link" href="/menu">Меню</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .chef-page {
+    padding-bottom: var(--space-6);
+  }
+  .chef-hero {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: 2rem;
+    padding-top: 1.25rem;
+  }
+  :where(.chef-hero > *) {
+    grid-column: 1 / -1;
+  }
+  .chef-hero__name {
+    display: grid;
+    margin-top: clamp(1rem, 0.5rem + 2vw, 3rem);
+    font-size: clamp(3.4rem, 0.8rem + 11vw, 12rem);
+  }
+  .chef-hero__name span:last-child {
+    padding-left: 0.6em;
+  }
+  .chef-hero__portrait {
+    grid-column: 2 / -1;
+  }
+  @media (min-width: 900px) {
+    .chef-hero__name {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      position: relative;
+      z-index: 2;
+    }
+    .chef-hero__portrait {
+      grid-column: 7 / 12;
+      grid-row: 2 / 4;
+      margin-top: 40%;
+    }
+    .chef-hero__lead {
+      grid-column: 1 / 6;
+      grid-row: 3;
+      align-self: start;
+    }
+  }
+
+  .awards {
+    margin-top: var(--space-6);
+  }
+  .awards__label {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(239 232 218 / 0.3);
+  }
+  .awards__list {
+    list-style: none;
+    padding: 0;
+  }
+  .awards__item {
+    display: grid;
+    gap: 0.5rem 2rem;
+    padding-block: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
+    border-bottom: 1px solid rgb(239 232 218 / 0.3);
+    align-items: baseline;
+  }
+  @media (min-width: 768px) {
+    .awards__item {
+      grid-template-columns: minmax(10rem, 3fr) 9fr;
+    }
+  }
+  .awards__mark {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 2.5rem + 6vw, 9rem);
+    line-height: 0.85;
+    color: var(--sage);
+  }
+  .awards__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.6rem);
+    line-height: 1.15;
+    max-width: 26ch;
+  }
+
+  .practice {
+    margin-top: var(--space-6);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: 2rem;
+  }
+  :where(.practice > *) {
+    grid-column: 1 / -1;
+  }
+  .practice__text {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  .practice__list {
+    list-style: none;
+    padding: 0;
+    font-size: var(--fs-lead);
+  }
+  .practice__list li {
+    padding-block: 0.75rem;
+    border-bottom: 1px solid rgb(239 232 218 / 0.2);
+  }
+  .practice__quote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--fs-h3);
+  }
+  .practice__detail {
+    grid-column: 1 / 8;
+  }
+  .practice__judge {
+    grid-column: 3 / -1;
+  }
+  @media (min-width: 900px) {
+    .practice__photo {
+      grid-column: 1 / 5;
+      grid-row: 1 / 3;
+    }
+    .practice__text {
+      grid-column: 6 / 12;
+      grid-row: 1;
+    }
+    .practice__detail {
+      grid-column: 6 / 9;
+      grid-row: 2;
+    }
+    .practice__judge {
+      grid-column: 3 / 9;
+      grid-row: 3;
+    }
+  }
+  .chef-cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .chef-cta__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+</style>

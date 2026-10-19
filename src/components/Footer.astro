@@ -1,0 +1,155 @@
+---
+import { nav, routeLinks, site } from '../config/site';
+import { hoursGroups } from '../lib/hours';
+import Logo from './Logo.astro';
+
+const groups = hoursGroups();
+const year = new Date().getFullYear();
+---
+
+<footer class="footer on-dark">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <Logo size="lg" />
+        <p class="muted">Ресторан в Тамбове</p>
+      </div>
+
+      <div class="footer__col">
+        <p class="label muted">Адрес</p>
+        <address>
+          {site.address.street}<br />{site.city}
+        </address>
+        <ul class="footer__routes">
+          {routeLinks.map((l) => (
+            <li><a href={l.href} target="_blank" rel="noopener">{l.label}<span class="visually-hidden"> (откроется в новой вкладке)</span></a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <p class="label muted">Часы работы</p>
+        <dl class="footer__hours">
+          {groups.map((g) => (<div><dt>{g.days}</dt><dd>{g.time}</dd></div>))}
+        </dl>
+      </div>
+
+      <div class="footer__col">
+        <p class="label muted">Телефон</p>
+        <a class="footer__phone" href={`tel:${site.phone.tel}`}>{site.phone.local}</a>
+        <p class="muted footer__small">{site.phone.international}</p>
+        {site.social.length > 0 && (
+          <ul class="footer__social">
+            {site.social.map((s) => (<li><a href={s.href} target="_blank" rel="noopener">{s.label}</a></li>))}
+          </ul>
+        )}
+      </div>
+    </div>
+
+    <nav class="footer__nav" aria-label="Разделы сайта в подвале">
+      <ul>
+        {nav.map((item) => (<li><a href={item.href}>{item.label}</a></li>))}
+      </ul>
+    </nav>
+
+    <div class="footer__legal">
+      <p>© {year} Ресторан «Базилик», Тамбов</p>
+      <a href="/politika-konfidencialnosti">Политика конфиденциальности</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: var(--space-5) 2rem;
+  }
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  @media (min-width: 720px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 1100px) {
+    .footer__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    }
+  }
+  .footer__brand p {
+    margin-top: 0.75rem;
+  }
+  .footer__col {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+  }
+  address {
+    font-style: normal;
+  }
+  .footer__routes,
+  .footer__social {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    font-size: var(--fs-small);
+  }
+  .footer__routes a,
+  .footer__social a {
+    color: var(--on-olive-2);
+  }
+  .footer__routes a:hover,
+  .footer__social a:hover {
+    color: var(--on-olive);
+  }
+  .footer__hours div {
+    display: flex;
+    gap: 1rem;
+  }
+  .footer__hours dt {
+    min-width: 3.5rem;
+  }
+  .footer__phone {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .footer__phone:hover {
+    color: var(--sage);
+  }
+  .footer__small {
+    font-size: var(--fs-small);
+  }
+  .footer__nav {
+    margin-top: var(--space-5);
+    padding-top: 1.25rem;
+    border-top: 1px solid rgb(239 232 218 / 0.18);
+  }
+  .footer__nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+  }
+  .footer__nav a {
+    text-decoration: none;
+  }
+  .footer__nav a:hover {
+    text-decoration: underline;
+  }
+  .footer__legal {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    font-size: 0.8125rem;
+    color: var(--on-olive-2);
+  }
+</style>

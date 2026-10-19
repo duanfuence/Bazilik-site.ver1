@@ -1,0 +1,49 @@
+---
+/** Открывающий блок внутренней страницы: метка раздела, крупный заголовок, вводный текст. */
+interface Props {
+  label: string;
+  num?: string;
+  class?: string;
+}
+const { label, num, class: className } = Astro.props;
+---
+
+<header class:list={['intro wrap', className]}>
+  <p class="index label">
+    {num && <span class="index__num">{num}</span>}
+    {label}
+  </p>
+  <h1 class="h1 intro__title"><slot name="title" /></h1>
+  {Astro.slots.has('default') && <div class="intro__lead lead"><slot /></div>}
+</header>
+
+<style>
+  .intro {
+    padding-block: 1.25rem var(--space-4);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+  }
+  :where(.intro > *) {
+    grid-column: 1 / -1;
+  }
+  .intro__title {
+    margin-top: clamp(1.5rem, 1rem + 3vw, 4rem);
+    font-size: var(--fs-display);
+    line-height: var(--lh-tight);
+    letter-spacing: -0.025em;
+  }
+  .intro__lead {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 900px) {
+    .intro__title {
+      grid-column: 1 / 10;
+    }
+    .intro__lead {
+      grid-column: 6 / 12;
+    }
+  }
+</style>

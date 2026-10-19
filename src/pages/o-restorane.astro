@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Photo from '../components/Photo.astro';
+import { chapters } from '../data/about';
+---
+
+<Base
+  title="О ресторане"
+  description="Ресторан «Базилик» в Тамбове на улице Селезнёвской, 2А: пространство, кухня шефа Александра Боярского, часы работы."
+>
+  <PageIntro label="О ресторане">
+    <Fragment slot="title">Ресторан <span class="accent">на Селезнёвской</span></Fragment>
+  </PageIntro>
+
+  <div class="wrap">
+    <Photo name="heroHall" class="about-cover" priority ratio="21/9" sizes="100vw" caption="Зал ресторана" />
+  </div>
+
+  {
+    chapters.map((c, i) => (
+      <section class:list={['chapter', i % 2 ? 'chapter--right' : 'chapter--left']} id={c.id} aria-labelledby={`${c.id}-t`}>
+        <div class="wrap chapter__grid">
+          <p class="chapter__kicker label">
+            <span class="index__num">{String(i + 1).padStart(2, '0')}</span> {c.kicker}
+          </p>
+          <div class="chapter__text" data-reveal>
+            <h2 id={`${c.id}-t`} class="h2">
+              {c.title} <span class="accent">{c.accent}</span>
+            </h2>
+            {c.text ? <p class="lead">{c.text}</p> : <p class="placeholder-note">Глава готовится. Нужно от ресторана: {c.needs}</p>}
+          </div>
+          {c.photos.map((p, j) => (
+            <Photo name={p} class={`chapter__photo chapter__photo--${j + 1}`} sizes="(min-width: 1024px) 40vw, 90vw" />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section wrap about-cta">
+    <h2 class="h-display">Ждём <span class="accent">в гости</span></h2>
+    <div class="about-cta__actions">
+      <a class="btn" href="/bron">Забронировать стол</a>
+      <a class="btn btn--ghost" href="/kontakty">Как добраться</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about-cover {
+    margin-bottom: var(--space-5);
+  }
+  .chapter {
+    padding-block: var(--space-5);
+  }
+  .chapter__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: 2rem;
+  }
+  :where(.chapter__grid > *) {
+    grid-column: 1 / -1;
+  }
+  .chapter__kicker {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--line-strong);
+  }
+  .chapter__text {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  .chapter__photo--2 {
+    grid-column: 4 / -1;
+  }
+  @media (min-width: 900px) {
+    .chapter--left .chapter__text {
+      grid-column: 1 / 6;
+      grid-row: 2;
+    }
+    .chapter--left .chapter__photo--1 {
+      grid-column: 7 / -1;
+      grid-row: 2 / 4;
+    }
+    .chapter--left .chapter__photo--2 {
+      grid-column: 2 / 6;
+      grid-row: 3;
+    }
+    .chapter--right .chapter__text {
+      grid-column: 7 / -1;
+      grid-row: 2;
+    }
+    .chapter--right .chapter__photo--1 {
+      grid-column: 1 / 6;
+      grid-row: 2 / 4;
+    }
+    .chapter--right .chapter__photo--2 {
+      grid-column: 8 / 11;
+      grid-row: 3;
+    }
+  }
+  .about-cta {
+    display: grid;
+    gap: 2rem;
+    justify-items: start;
+    border-top: 1px solid var(--line-strong);
+  }
+  .about-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+</style>

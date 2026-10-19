@@ -1,0 +1,89 @@
+/*
+ * Дизайн-токены «Базилика».
+ * Концепция «Тетрадь шефа»: тёплая бумага, чернила и томатный акцент —
+ * базилик и томат как естественная пара. Тёмно-оливковый («базиликовое масло»)
+ * — для вечерних и «шефских» разделов, точечно.
+ * Контраст всех текстовых пар проверен по WCAG AA (≥ 4.5:1).
+ */
+:root {
+  /* Бумага */
+  --paper: #f3ede2;
+  --paper-2: #eae2d4;
+  --paper-3: #ddd1bd;
+  /* Чернила */
+  --ink: #1d1915;
+  --ink-2: #4a423a;
+  --ink-3: #6b6156; /* подписи; 5.2:1 на --paper */
+  --line: rgb(29 25 21 / 0.16);
+  --line-strong: rgb(29 25 21 / 0.4);
+
+  /* Томат — главный акцент: действия, курсивные акценты */
+  --tomato: #ae3a20; /* 5.3:1 на --paper */
+  --tomato-hover: #95301a;
+  --tomato-press: #7d2714;
+  --on-tomato: #f6f0e6; /* 5.4:1 на --tomato */
+
+  /* Базиликовое масло — тёмные секции */
+  --olive: #232a1f;
+  --olive-2: #2f3829;
+  --on-olive: #efe8da; /* 12:1 */
+  --on-olive-2: #b9b09f; /* 6.9:1 */
+  --sage: #a9b98a; /* акцент на тёмном, 7:1 */
+
+  /* Состояния */
+  --error: #a3271b;
+  --error-bg: #f6e3dc;
+  --success: #3d5a2b;
+  --success-bg: #e4e8d6;
+  --focus: #ae3a20;
+
+  /* Типографика */
+  --font-display: 'Bona Nova', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-text: 'Onest Variable', 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --fs-mega: clamp(4.25rem, 1.2rem + 15.5vw, 15rem);
+  --fs-display: clamp(2.9rem, 1.6rem + 6vw, 7.5rem);
+  --fs-h1: clamp(2.5rem, 1.6rem + 4vw, 5.5rem);
+  --fs-h2: clamp(2rem, 1.4rem + 2.6vw, 4rem);
+  --fs-h3: clamp(1.45rem, 1.25rem + 0.8vw, 2rem);
+  --fs-lead: clamp(1.15rem, 1.05rem + 0.45vw, 1.45rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.75rem;
+
+  --lh-tight: 0.98;
+  --lh-head: 1.08;
+  --lh-body: 1.6;
+  --tracking-label: 0.14em;
+
+  /* Сетка и ритм */
+  --gutter: clamp(1rem, 0.4rem + 3vw, 3.5rem);
+  --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  --max: 1560px;
+  --measure: 38rem;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: clamp(3rem, 2rem + 4vw, 6rem);
+  --space-6: clamp(4.5rem, 3rem + 6vw, 10rem);
+
+  --radius: 2px; /* почти прямые углы — бумага, а не пилюли */
+  --header-h: 4.25rem;
+
+  /* Движение */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-1: 160ms;
+  --dur-2: 320ms;
+  --dur-3: 700ms;
+
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0ms;
+    --dur-2: 0ms;
+    --dur-3: 0ms;
+  }
+}

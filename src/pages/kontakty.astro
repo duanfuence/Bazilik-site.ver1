@@ -1,0 +1,181 @@
+---
+import Base from '../layouts/Base.astro';
+import HoursTable from '../components/HoursTable.astro';
+import OpenStatus from '../components/OpenStatus.astro';
+import { routeLinks, site } from '../config/site';
+import { restaurantSchema } from '../lib/schema';
+
+const origin = Astro.site ?? new URL(Astro.url.origin);
+---
+
+<Base
+  title="Контакты и часы работы"
+  description="Ресторан «Базилик»: Тамбов, улица Селезнёвская, 2А. Телефон 55-82-53. Вс–Чт 11:00–23:00, Пт–Сб 11:00–00:00. Маршрут в Яндекс Картах, 2ГИС и Google Maps."
+  jsonLd={restaurantSchema(origin)}
+>
+  <div class="wrap contacts">
+    <p class="index label contacts__index"><span class="index__num">—</span> Контакты</p>
+
+    <h1 class="contacts__title">
+      <span class="visually-hidden">Контакты ресторана «Базилик»: </span>
+      <span class="h-display contacts__street">Селезнёвская, <span class="accent">2А</span></span>
+      <span class="contacts__city">{site.city}</span>
+    </h1>
+
+    <div class="contacts__block contacts__phone-block">
+      <p class="label muted">Телефон</p>
+      <a class="contacts__phone" href={`tel:${site.phone.tel}`}>{site.phone.local}</a>
+      <p class="muted">{site.phone.international} · бронь, банкеты, вопросы</p>
+    </div>
+
+    <div class="contacts__block contacts__hours">
+      <p class="label muted">Часы работы</p>
+      <OpenStatus class="contacts__status" />
+      <HoursTable full />
+    </div>
+
+    <div class="contacts__block contacts__route">
+      <p class="label muted">Маршрут</p>
+      <ul class="contacts__routes">
+        {
+          routeLinks.map((l) => (
+            <li>
+              <a href={l.href} target="_blank" rel="noopener">
+                <span>{l.label}</span>
+                <span aria-hidden="true">↗</span>
+                <span class="visually-hidden"> (откроется в новой вкладке)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="contacts__block contacts__write">
+      <p class="label muted">Онлайн</p>
+      <ul class="contacts__actions">
+        <li><a class="btn" href="/bron">Забронировать стол</a></li>
+        <li><a class="btn btn--ghost" href="/bankety#zayavka">Заявка на банкет</a></li>
+      </ul>
+      {
+        site.social.length > 0 ? (
+          <ul class="contacts__social">
+            {site.social.map((s) => (<li><a class="arrow-link" href={s.href} target="_blank" rel="noopener">{s.label}</a></li>))}
+          </ul>
+        ) : (
+          <p class="placeholder-note">Соцсети и мессенджеры ресторана появятся здесь, когда будут переданы ссылки.</p>
+        )
+      }
+    </div>
+
+    {
+      site.mapEmbedUrl && (
+        <div class="contacts__map" data-map>
+          <button class="btn btn--ghost" type="button" data-map-load>Показать карту</button>
+          <template data-map-template>
+            <iframe src={site.mapEmbedUrl} title={`Карта: ${site.address.street}, ${site.city}`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </template>
+        </div>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .contacts {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--space-4);
+    padding-block: 1.25rem var(--space-6);
+  }
+  :where(.contacts > *) {
+    grid-column: 1 / -1;
+  }
+  .contacts__title {
+    display: grid;
+    margin-top: clamp(1rem, 0.5rem + 2vw, 3rem);
+  }
+  .contacts__street {
+    font-size: clamp(3rem, 1rem + 9vw, 10rem);
+    line-height: 0.92;
+  }
+  .contacts__city {
+    margin-top: 1rem;
+    font-family: var(--font-text);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+  .contacts__block {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+  }
+  .contacts__phone {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 2rem + 3.5vw, 5rem);
+    line-height: 1;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .contacts__phone:hover {
+    color: var(--tomato);
+  }
+  .contacts__status {
+    font-weight: 500;
+  }
+  .contacts__routes {
+    list-style: none;
+    padding: 0;
+  }
+  .contacts__routes a {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 0.8rem;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    font-size: 1.15rem;
+    transition: color var(--dur-1) var(--ease), padding var(--dur-2) var(--ease);
+  }
+  .contacts__routes a:hover {
+    color: var(--tomato);
+    padding-left: 0.4rem;
+  }
+  .contacts__actions,
+  .contacts__social {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .contacts__map iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+  @media (min-width: 900px) {
+    .contacts__phone-block {
+      grid-column: 1 / 6;
+    }
+    .contacts__hours {
+      grid-column: 7 / -1;
+    }
+    .contacts__route {
+      grid-column: 1 / 6;
+    }
+    .contacts__write {
+      grid-column: 7 / -1;
+    }
+  }
+</style>
+
+<script>
+  // Карта грузится только по запросу: быстрее страница и меньше сторонних запросов
+  document.querySelector('[data-map-load]')?.addEventListener('click', (e) => {
+    const wrap = (e.currentTarget as HTMLElement).closest('[data-map]')!;
+    const tpl = wrap.querySelector<HTMLTemplateElement>('[data-map-template]')!;
+    wrap.replaceChildren(tpl.content.cloneNode(true));
+  });
+</script>

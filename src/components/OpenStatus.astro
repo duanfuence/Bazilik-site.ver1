@@ -1,0 +1,53 @@
+---
+/**
+ * «Открыто до 23:00» — считается в браузере по московскому времени.
+ * Без JavaScript показываем общее расписание.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<span class:list={['status', className]} data-open-status>
+  <span class="status__dot" aria-hidden="true"></span>
+  <span class="status__text">Ежедневно с 11:00</span>
+</span>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+  }
+  .status__dot {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: var(--ink-3);
+    flex: none;
+  }
+  .status[data-state='open'] .status__dot {
+    background: #4f7a35;
+    box-shadow: 0 0 0 3px rgb(79 122 53 / 0.18);
+  }
+  .status[data-state='closed'] .status__dot {
+    background: transparent;
+    border: 1.5px solid currentColor;
+  }
+</style>
+
+<script>
+  import { describeStatus, openStatus, zonedNow } from '../lib/hours';
+
+  function update() {
+    const status = openStatus(zonedNow());
+    for (const el of document.querySelectorAll<HTMLElement>('[data-open-status]')) {
+      el.dataset.state = status.open ? 'open' : 'closed';
+      const text = el.querySelector('.status__text');
+      if (text) text.textContent = describeStatus(status);
+    }
+  }
+  update();
+  setInterval(update, 60_000);
+</script>

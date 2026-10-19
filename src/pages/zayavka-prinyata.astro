@@ -1,0 +1,36 @@
+---
+/** Результат отправки формы без JavaScript (сервер перенаправляет сюда). */
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+
+<Base title="Заявка получена" description="Заявка получена. Администратор свяжется с вами для подтверждения." noindex>
+  <section class="wrap result">
+    <p class="index label"><span class="index__num">—</span> Заявка</p>
+    <h1 class="h1">Заявка <span class="accent">получена</span></h1>
+    <p class="lead" data-request-id hidden></p>
+    <p class="lead">
+      <strong>Это ещё не подтверждённая бронь.</strong> Администратор свяжется с вами по указанному телефону, чтобы всё подтвердить.
+      Если планы изменятся — позвоните: <a href={`tel:${site.phone.tel}`}>{site.phone.local}</a>.
+    </p>
+    <a class="arrow-link" href="/">На главную</a>
+  </section>
+</Base>
+
+<style>
+  .result {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    padding-block: 1.25rem var(--space-6);
+  }
+</style>
+
+<script>
+  const id = new URLSearchParams(location.search).get('n');
+  const el = document.querySelector<HTMLElement>('[data-request-id]');
+  if (id && el && /^[БМ]-[A-Z0-9]{5}$/.test(id)) {
+    el.textContent = `Номер заявки: ${id}`;
+    el.hidden = false;
+  }
+</script>

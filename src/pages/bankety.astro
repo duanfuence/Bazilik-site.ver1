@@ -1,0 +1,254 @@
+---
+import '../styles/forms.css';
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import BanquetForm from '../components/BanquetForm.astro';
+import { site } from '../config/site';
+import { banquetFacts, banquetSteps, occasions } from '../data/events';
+---
+
+<Base
+  title="Банкеты и мероприятия"
+  description="Банкеты в ресторане «Базилик» в Тамбове: дни рождения, семейные праздники, корпоративы. Оставьте заявку — администратор перезвонит и обсудит формат и меню."
+>
+  <section class="on-tomato bq-hero" aria-labelledby="bq-title">
+    <div class="wrap bq-hero__grid">
+      <p class="index label bq-hero__index"><span class="index__num">—</span> Банкеты и события</p>
+      <h1 id="bq-title" class="h-display bq-hero__title">
+        Соберём вечер <span class="accent">под ваш повод</span>
+      </h1>
+      <div class="bq-hero__text">
+        <p class="lead">Оставьте заявку с датой и числом гостей — администратор перезвонит, расскажет о возможностях зала и обсудит с вами меню.</p>
+        <div class="bq-hero__actions">
+          <a class="btn btn--paper" href="#zayavka">Оставить заявку</a>
+          <a class="btn btn--ghost" href={`tel:${site.phone.tel}`}>Позвонить: {site.phone.local}</a>
+        </div>
+      </div>
+      <Photo name="banquetTable" class="bq-hero__photo" priority sizes="(min-width: 1024px) 60vw, 100vw" />
+    </div>
+  </section>
+
+  <!-- Поводы: крупная типографика, у каждого — короткая пометка -->
+  <section class="section occasions" aria-labelledby="occ-title">
+    <div class="wrap grid">
+      <h2 id="occ-title" class="label occ__label">С какими поводами можно прийти</h2>
+      <ul class="occ__list">
+        {
+          occasions.map((o, i) => (
+            <li class="occ__item" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+              <span class="occ__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="occ__title">{o.title}</span>
+              <span class="occ__note">{o.note}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <Photo name="banquetToast" class="occ__photo" sizes="(min-width: 1024px) 30vw, 70vw" />
+      <Photo name="banquetDessert" class="occ__photo2" sizes="(min-width: 1024px) 20vw, 50vw" />
+    </div>
+  </section>
+
+  <section class="section section--tight on-paper-2 how" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 id="how-title" class="h2">Как это <span class="accent">устроено</span></h2>
+      <ol class="how__steps">
+        {
+          banquetSteps.map((s, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 90}ms`}>
+              <span class="how__n">{i + 1}</span>
+              <h3 class="h3">{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      {
+        banquetFacts.length > 0 ? (
+          <dl class="how__facts">
+            {banquetFacts.map((f) => (<div><dt class="label muted">{f.label}</dt><dd>{f.value}</dd></div>))}
+          </dl>
+        ) : (
+          <p class="placeholder-note how__note">Вместимость зала, депозит и банкетное меню появятся здесь, когда ресторан их подтвердит. Сейчас эти детали расскажет администратор.</p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section form-section" id="zayavka" aria-labelledby="form-title">
+    <div class="wrap grid">
+      <div class="form-section__aside">
+        <p class="index label"><span class="index__num">—</span> Заявка</p>
+        <h2 id="form-title" class="h2">Расскажите <span class="accent">о празднике</span></h2>
+        <p class="muted">Заявка ни к чему не обязывает: это начало разговора. Дату закрепляем после звонка администратора.</p>
+      </div>
+      <div class="form-section__form">
+        <BanquetForm />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .bq-hero {
+    padding-block: 1.25rem var(--space-5);
+  }
+  .bq-hero__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: 2rem;
+  }
+  :where(.bq-hero__grid > *) {
+    grid-column: 1 / -1;
+  }
+  .bq-hero__title {
+    margin-top: clamp(1rem, 0.5rem + 2vw, 3rem);
+  }
+  .bq-hero__text {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .bq-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  @media (min-width: 1024px) {
+    .bq-hero__title {
+      grid-column: 1 / 11;
+    }
+    .bq-hero__text {
+      grid-column: 1 / 5;
+      align-self: start;
+    }
+    .bq-hero__photo {
+      grid-column: 6 / -1;
+      grid-row: 3 / 5;
+    }
+  }
+
+  .occ__label {
+    grid-column: 1 / -1;
+    margin-bottom: 1.5rem;
+  }
+  .occ__list {
+    grid-column: 1 / -1;
+    list-style: none;
+    padding: 0;
+  }
+  .occ__item {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0.1rem 1rem;
+    align-items: baseline;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line-strong);
+  }
+  .occ__num {
+    grid-row: 1 / 3;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--tomato);
+  }
+  .occ__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 1.4rem + 2.2vw, 3.6rem);
+    line-height: 1.05;
+  }
+  .occ__note {
+    color: var(--ink-3);
+    font-size: var(--fs-small);
+  }
+  .occ__photo {
+    grid-column: 3 / -1;
+    margin-top: 2rem;
+  }
+  .occ__photo2 {
+    grid-column: 1 / 8;
+    margin-top: 1.5rem;
+  }
+  @media (min-width: 900px) {
+    .occ__item {
+      grid-template-columns: 3rem auto 1fr;
+    }
+    .occ__num {
+      grid-row: auto;
+    }
+    .occ__note {
+      justify-self: end;
+      text-align: right;
+    }
+    .occ__list {
+      grid-column: 1 / 9;
+    }
+    .occ__photo {
+      grid-column: 10 / -1;
+      grid-row: 2;
+      margin-top: 0;
+    }
+    .occ__photo2 {
+      grid-column: 9 / 12;
+      grid-row: 3;
+      margin-top: -4rem;
+    }
+  }
+
+  .how__steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 2rem var(--col-gap);
+    margin-top: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .how__steps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .how__steps li {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line-strong);
+  }
+  .how__n {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--tomato);
+  }
+  .how__note {
+    margin-top: var(--space-4);
+    max-width: 44rem;
+  }
+  .how__facts {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .form-section .grid {
+    row-gap: 2rem;
+  }
+  .form-section__aside {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+  .form-section__form {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 1024px) {
+    .form-section__aside {
+      grid-column: 1 / 5;
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+      align-self: start;
+    }
+    .form-section__form {
+      grid-column: 6 / -1;
+    }
+  }
+</style>

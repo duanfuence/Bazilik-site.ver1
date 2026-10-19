@@ -1,0 +1,575 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import OpenStatus from '../components/OpenStatus.astro';
+import MenuStrip from '../components/MenuStrip.astro';
+import HoursTable from '../components/HoursTable.astro';
+import { routeLinks, site } from '../config/site';
+import { menu } from '../data/menu';
+import { chef } from '../data/chef';
+import { occasions } from '../data/events';
+import { restaurantSchema } from '../lib/schema';
+
+// Превью меню: по две позиции из каждого «фотогеничного» раздела
+const preview = menu
+  .filter((c) => c.layout === 'gallery')
+  .flatMap((c) => c.items.slice(0, 2).map((item) => ({ ...item, kicker: c.title })));
+
+const origin = Astro.site ?? new URL(Astro.url.origin);
+---
+
+<Base
+  title="Главная"
+  fullTitle="Базилик — ресторан в Тамбове на Селезнёвской"
+  description="Ресторан «Базилик» в Тамбове, улица Селезнёвская, 2А. Кухня шефа Александра Боярского, меню, бронирование столов и банкеты. Телефон 55-82-53."
+  jsonLd={restaurantSchema(origin)}
+>
+  <!-- Обложка -->
+  <section class="cover" aria-labelledby="cover-title">
+    <div class="wrap">
+      <div class="cover__meta label">
+        <span>Ресторан · {site.city}</span>
+        <OpenStatus />
+      </div>
+
+      <div class="cover__grid">
+        <h1 id="cover-title" class="cover__title">
+          <span class="h-mega cover__word">Базилик</span>
+          <span class="cover__sub accent">на Селезнёвской</span>
+        </h1>
+
+        <Photo name="heroHall" class="cover__hall" priority sizes="(min-width: 1024px) 38vw, 88vw" caption="Зал вечером" />
+        <Photo name="heroDish" class="cover__dish" sizes="(min-width: 1024px) 18vw, 40vw" />
+
+        <div class="cover__intro">
+          <p class="lead">
+            Ресторан в Тамбове с кухней шефа Александра Боярского — победителя номинации «Лучший кондитер России».
+            Обеды, ужины, праздники и банкеты.
+          </p>
+          <div class="cover__actions">
+            <a class="btn" href="/bron">Забронировать стол</a>
+            <a class="arrow-link" href="/menu">Смотреть меню</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Сегодня: часы, адрес, телефон — то, что ищут первым -->
+  <section class="today on-paper-2" aria-label="Часы работы и контакты">
+    <div class="wrap today__grid">
+      <div>
+        <p class="label muted">Часы работы</p>
+        <HoursTable />
+      </div>
+      <div>
+        <p class="label muted">Адрес</p>
+        <p class="today__big">{site.address.short}</p>
+        <a class="arrow-link today__link" href={routeLinks[0].href} target="_blank" rel="noopener">
+          Построить маршрут<span class="visually-hidden"> в Яндекс Картах (откроется в новой вкладке)</span>
+        </a>
+      </div>
+      <div>
+        <p class="label muted">Телефон</p>
+        <a class="today__big today__phone" href={`tel:${site.phone.tel}`}>{site.phone.local}</a>
+        <p class="muted today__note">Бронь, банкеты и любые вопросы</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 Меню -->
+  <section class="section menu-teaser" aria-labelledby="menu-title">
+    <div class="wrap grid">
+      <p class="index label teaser-index"><span class="index__num">01</span> Меню</p>
+      <h2 id="menu-title" class="h-display teaser-title" data-reveal>
+        Кухня <span class="accent">в деталях</span>
+      </h2>
+      <div class="teaser-text" data-reveal>
+        <p>Закуски, горячее и десерты от шефа-кондитера. Листайте ленту — или откройте полное меню с ценами и выходом блюд.</p>
+        <a class="arrow-link" href="/menu">Открыть меню</a>
+      </div>
+    </div>
+    <div class="teaser-strip">
+      <MenuStrip id="home" label="Избранное из меню" items={preview} />
+    </div>
+  </section>
+
+  <!-- 02 Шеф -->
+  <section class="section on-dark chef" aria-labelledby="chef-title">
+    <div class="wrap grid">
+      <div class="chef__photo" data-reveal>
+        <Photo name="chefPortrait" sizes="(min-width: 1024px) 40vw, 100vw" />
+      </div>
+      <div class="chef__body">
+        <p class="index label"><span class="index__num">02</span> Шеф</p>
+        <h2 id="chef-title" class="h-display chef__name" data-reveal>
+          Александр <span class="accent">Боярский</span>
+        </h2>
+        <p class="lead muted">{chef.role}. Кондитер и повар, судья кулинарных чемпионатов.</p>
+
+        <ol class="ledger">
+          {
+            chef.achievements.map((a, i) => (
+              <li class="ledger__row" data-reveal style={`--reveal-delay:${i * 90}ms`}>
+                <span class="ledger__mark">{a.mark}</span>
+                <span class="ledger__text">{a.title}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="chef__exp muted">{chef.experience.join(' · ')}</p>
+        <a class="arrow-link" href="/shef">О шефе</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Пространство -->
+  <section class="section space" aria-labelledby="space-title">
+    <div class="wrap grid space__grid">
+      <p class="index label space__index"><span class="index__num">03</span> Пространство</p>
+      <Photo name="interiorWide" class="space__wide" sizes="(min-width: 1024px) 62vw, 100vw" caption="Общий план зала" />
+      <Photo name="interiorTable" class="space__table" sizes="(min-width: 1024px) 28vw, 60vw" />
+      <div class="space__text" data-reveal>
+        <h2 id="space-title" class="h2">Свет, стол <span class="accent">и&nbsp;разговор</span></h2>
+        <p>
+          Приходите на обед, ужин с близкими или встречу с друзьями. Если нужен стол на определённое время — оставьте заявку
+          заранее, администратор перезвонит и подтвердит.
+        </p>
+        <a class="arrow-link" href="/o-restorane">О ресторане</a>
+      </div>
+      <Photo name="interiorDetail" class="space__detail" sizes="(min-width: 1024px) 20vw, 40vw" />
+    </div>
+  </section>
+
+  <!-- 04 Банкеты -->
+  <section class="section on-tomato banquet" aria-labelledby="banquet-title">
+    <div class="wrap grid">
+      <p class="index label banquet__index"><span class="index__num">04</span> Банкеты и события</p>
+      <h2 id="banquet-title" class="h-display banquet__title" data-reveal>
+        Праздник <span class="accent">за большим столом</span>
+      </h2>
+      <ul class="banquet__list" aria-label="Поводы">
+        {occasions.map((o) => <li>{o.title}</li>)}
+      </ul>
+      <div class="banquet__cta" data-reveal>
+        <p>Расскажите о поводе, дате и числе гостей — администратор перезвонит и предложит формат и меню.</p>
+        <div class="banquet__actions">
+          <a class="btn btn--paper" href="/bankety#zayavka">Оставить заявку</a>
+          <a class="btn btn--ghost" href="/bankety">Подробнее</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Как нас найти -->
+  <section class="section find" aria-labelledby="find-title">
+    <div class="wrap grid">
+      <p class="index label find__index"><span class="index__num">05</span> Как нас найти</p>
+      <h2 id="find-title" class="find__address h-display" data-reveal>
+        Селезнёвская, <span class="accent">2А</span>
+      </h2>
+      <div class="find__col find__col--a">
+        <p class="label muted">Телефон</p>
+        <a class="find__phone" href={`tel:${site.phone.tel}`}>{site.phone.local}</a>
+        <p class="muted">{site.phone.international}</p>
+      </div>
+      <div class="find__col find__col--b">
+        <p class="label muted">Часы</p>
+        <HoursTable />
+      </div>
+      <div class="find__col find__col--c">
+        <p class="label muted">Маршрут</p>
+        <ul class="find__routes">
+          {
+            routeLinks.map((l) => (
+              <li>
+                <a class="arrow-link" href={l.href} target="_blank" rel="noopener">
+                  {l.label}
+                  <span class="visually-hidden"> (откроется в новой вкладке)</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="btn btn--ink find__book" href="/bron">Забронировать стол</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Обложка ---------- */
+  .cover {
+    padding-block: 1.25rem var(--space-5);
+  }
+  .cover__meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .cover__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: 1.5rem;
+    margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+  .cover__title {
+    grid-column: 1 / -1;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    line-height: 1;
+  }
+  .cover__word {
+    display: block;
+    margin-left: -0.04em;
+  }
+  .cover__sub {
+    font-size: clamp(1.6rem, 1.1rem + 2.6vw, 3.6rem);
+    letter-spacing: -0.01em;
+    margin-top: 0.15em;
+    padding-left: 0.1em;
+  }
+  .cover__hall {
+    grid-column: 3 / -1;
+  }
+  .cover__dish {
+    display: none;
+  }
+  .cover__intro {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .cover__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+  }
+
+  @media (min-width: 600px) and (max-width: 899px) {
+    .cover__hall {
+      grid-column: 7 / -1;
+      grid-row: 2;
+    }
+    .cover__intro {
+      grid-column: 1 / 7;
+      grid-row: 2;
+      align-self: end;
+    }
+  }
+  @media (min-width: 900px) {
+    .cover__grid {
+      grid-template-rows: auto auto 1fr;
+    }
+    .cover__title {
+      grid-column: 1 / 12;
+      grid-row: 1;
+      align-self: start;
+    }
+    .cover__sub {
+      padding-left: 22%;
+    }
+    .cover__hall {
+      grid-column: 8 / -1;
+      grid-row: 1 / 4;
+      margin-top: clamp(3rem, 7vw, 8rem);
+    }
+    .cover__dish {
+      display: block;
+      grid-column: 1 / 4;
+      grid-row: 2 / 4;
+      align-self: start;
+      margin-top: 2.5rem;
+    }
+    .cover__intro {
+      grid-column: 4 / 8;
+      grid-row: 2 / 4;
+      align-self: start;
+      margin-top: 2.5rem;
+    }
+  }
+
+  /* ---------- Сегодня ---------- */
+  .today {
+    padding-block: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+  .today__grid {
+    display: grid;
+    gap: 2rem var(--col-gap);
+  }
+  @media (min-width: 768px) {
+    .today__grid {
+      grid-template-columns: 1.2fr 1fr 1fr;
+    }
+  }
+  .today__grid > div {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+  }
+  .today__big {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.6rem);
+    line-height: 1.05;
+  }
+  .today__phone {
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .today__phone:hover {
+    color: var(--tomato);
+  }
+  .today__link {
+    justify-self: start;
+  }
+  .today__note {
+    font-size: var(--fs-small);
+  }
+
+  /* ---------- Меню ---------- */
+  .menu-teaser {
+    padding-bottom: var(--space-5);
+  }
+  .teaser-index {
+    grid-column: 1 / -1;
+  }
+  .teaser-title {
+    grid-column: 1 / -1;
+    margin-top: 1.5rem;
+  }
+  .teaser-text {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    margin-top: 1.5rem;
+    max-width: 30rem;
+  }
+  @media (min-width: 900px) {
+    .teaser-title {
+      grid-column: 1 / 8;
+    }
+    .teaser-text {
+      grid-column: 9 / -1;
+      align-self: end;
+    }
+  }
+  .teaser-strip {
+    margin-top: var(--space-4);
+  }
+
+  /* ---------- Шеф ---------- */
+  .chef .grid {
+    row-gap: 2.5rem;
+  }
+  .chef__photo {
+    grid-column: 1 / -1;
+  }
+  .chef__body {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+    justify-items: start;
+  }
+  @media (min-width: 900px) {
+    .chef__photo {
+      grid-column: 1 / 6;
+    }
+    .chef__body {
+      grid-column: 7 / -1;
+    }
+  }
+  .chef__name {
+    margin-top: 0.5rem;
+  }
+  .ledger {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  .ledger__row {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, auto) 1fr;
+    gap: 1.25rem;
+    align-items: baseline;
+    padding-block: 1rem;
+    border-top: 1px solid rgb(239 232 218 / 0.2);
+  }
+  .ledger__row:last-child {
+    border-bottom: 1px solid rgb(239 232 218 / 0.2);
+  }
+  .ledger__mark {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 1.8rem + 2.4vw, 4rem);
+    line-height: 0.9;
+    color: var(--sage);
+    white-space: nowrap;
+  }
+  .ledger__text {
+    font-size: var(--fs-lead);
+    line-height: 1.35;
+  }
+  .chef__exp {
+    font-size: var(--fs-small);
+  }
+
+  /* ---------- Пространство ---------- */
+  .space__grid {
+    row-gap: 2rem;
+  }
+  .space__index {
+    grid-column: 1 / -1;
+  }
+  .space__wide {
+    grid-column: 1 / -1;
+  }
+  .space__table {
+    grid-column: 4 / -1;
+  }
+  .space__text {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    max-width: 34rem;
+  }
+  .space__detail {
+    display: none;
+  }
+  @media (min-width: 900px) {
+    .space__wide {
+      grid-column: 1 / 9;
+      grid-row: 2;
+    }
+    .space__table {
+      grid-column: 10 / -1;
+      grid-row: 2 / 4;
+      margin-top: 40%;
+    }
+    .space__text {
+      grid-column: 2 / 7;
+      grid-row: 3;
+      margin-top: 1rem;
+    }
+    .space__detail {
+      display: block;
+      grid-column: 7 / 9;
+      grid-row: 3;
+      margin-top: -3rem;
+    }
+  }
+
+  /* ---------- Банкеты ---------- */
+  .banquet .grid {
+    row-gap: 2rem;
+  }
+  .banquet__index,
+  .banquet__title,
+  .banquet__list,
+  .banquet__cta {
+    grid-column: 1 / -1;
+  }
+  .banquet__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.6rem);
+    line-height: 1.2;
+  }
+  .banquet__list li:not(:last-child)::after {
+    content: '/';
+    margin-inline: 0.5em;
+    opacity: 0.5;
+  }
+  .banquet__cta {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 34rem;
+  }
+  .banquet__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  @media (min-width: 900px) {
+    .banquet__title {
+      grid-column: 1 / 10;
+    }
+    .banquet__list {
+      grid-column: 1 / 9;
+    }
+    .banquet__cta {
+      grid-column: 9 / -1;
+      grid-row: 3;
+      align-self: end;
+    }
+  }
+
+  /* ---------- Как нас найти ---------- */
+  .find .grid {
+    row-gap: 2.5rem;
+  }
+  .find__index,
+  .find__address {
+    grid-column: 1 / -1;
+  }
+  .find__col {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+  }
+  .find__phone {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.6rem);
+    line-height: 1;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .find__phone:hover {
+    color: var(--tomato);
+  }
+  .find__routes {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .find__book {
+    justify-self: start;
+    margin-top: 1rem;
+  }
+  @media (min-width: 768px) {
+    .find__col--a {
+      grid-column: 1 / 7;
+    }
+    .find__col--b {
+      grid-column: 7 / -1;
+    }
+    .find__col--c {
+      grid-column: 1 / 7;
+    }
+  }
+  @media (min-width: 1100px) {
+    .find__col--a {
+      grid-column: 1 / 5;
+    }
+    .find__col--b {
+      grid-column: 5 / 9;
+    }
+    .find__col--c {
+      grid-column: 10 / -1;
+    }
+  }
+</style>

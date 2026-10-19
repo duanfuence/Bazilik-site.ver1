@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import { nav } from '../config/site';
+---
+
+<Base title="Страница не найдена" description="Такой страницы нет на сайте ресторана «Базилик»." noindex>
+  <section class="wrap nf">
+    <p class="h-mega nf__code" aria-hidden="true">404</p>
+    <h1 class="h2">Такой страницы <span class="accent">нет в меню</span></h1>
+    <ul class="nf__links">
+      {nav.map((n) => <li><a class="arrow-link" href={n.href}>{n.label}</a></li>)}
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    gap: 2rem;
+    padding-block: var(--space-5) var(--space-6);
+  }
+  .nf__code {
+    color: var(--paper-3);
+  }
+  .nf__links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+  }
+</style>

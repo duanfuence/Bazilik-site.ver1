@@ -1,0 +1,33 @@
+---
+/** Поле формы: подпись, подсказка и место для ошибки, связанные через aria-describedby в скрипте. */
+interface Props {
+  id: string;
+  label: string;
+  hint?: string;
+  /** Имя поля в данных (для вывода серверных ошибок) */
+  name: string;
+  class?: string;
+  as?: 'div' | 'fieldset';
+}
+const { id, label, hint, name, class: className, as = 'div' } = Astro.props;
+const Tag = as;
+---
+
+<Tag class:list={['field', className]} data-field={name}>
+  {as === 'fieldset' ? <legend class="field__label">{label}</legend> : <label class="field__label" for={id}>{label}</label>}
+  <slot />
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  <p class="field__error" id={`${id}-error`} aria-live="polite"></p>
+</Tag>
+
+<style>
+  fieldset.field {
+    border: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  fieldset.field legend {
+    padding: 0;
+    margin-bottom: 0.5rem;
+  }
+</style>

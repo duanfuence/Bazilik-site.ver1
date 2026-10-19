@@ -1,0 +1,169 @@
+---
+/**
+ * Фотография или, пока снимка нет, арт-направленная заглушка с брифом кадра.
+ * Заглушка декоративна для скринридеров (aria-hidden), реальное фото получает alt.
+ */
+import { Picture } from 'astro:assets';
+import { photos, type PhotoKey, type PhotoSlot } from '../data/photos';
+
+interface Props {
+  name?: PhotoKey;
+  photo?: PhotoSlot;
+  /** Атрибут sizes для адаптивных изображений */
+  sizes?: string;
+  /** Первый экран: грузить сразу и с высоким приоритетом */
+  priority?: boolean;
+  /** Подпись под кадром в стиле печатного меню */
+  caption?: string;
+  class?: string;
+  /** Переопределить пропорции (например, на определённой сетке) */
+  ratio?: string;
+}
+
+const { name, photo: slotProp, sizes = '(min-width: 1024px) 50vw, 100vw', priority = false, caption, ratio, class: className } = Astro.props;
+const slot = slotProp ?? (name ? photos[name] : undefined);
+if (!slot) throw new Error('Photo: укажите name или photo');
+const aspect = ratio ?? slot.ratio;
+const ratioLabel = aspect.replace('/', ':');
+---
+
+<figure class:list={['photo', `tone-${slot.tone}`, className]} style={`--ratio:${aspect}`}>
+  {
+    slot.src ? (
+      <Picture
+        src={slot.src}
+        alt={slot.alt}
+        formats={['avif', 'webp']}
+        widths={[480, 800, 1200, 1600, 2200]}
+        sizes={sizes}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : 'auto'}
+        decoding="async"
+        class="photo__img"
+      />
+    ) : (
+      <div class="photo__ph" aria-hidden="true">
+        <span class="photo__corner photo__corner--tl" />
+        <span class="photo__corner photo__corner--tr" />
+        <span class="photo__corner photo__corner--bl" />
+        <span class="photo__corner photo__corner--br" />
+        <span class="photo__ratio">кадр {ratioLabel}</span>
+        <span class="photo__brief">{slot.brief}</span>
+      </div>
+    )
+  }
+  {caption && <figcaption class="photo__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .photo {
+    position: relative;
+    min-width: 0;
+  }
+  .photo__img,
+  .photo__ph {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo__ph {
+    --ph-bg: var(--paper-3);
+    --ph-fg: var(--ink-2);
+    --ph-light: rgb(255 244 222 / 0.65);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(0.85rem, 0.6rem + 1vw, 1.4rem);
+    color: var(--ph-fg);
+    /* Тёплое пятно света — подсказка, каким должен быть свет в кадре */
+    background:
+      radial-gradient(120% 90% at 28% 22%, var(--ph-light), transparent 62%),
+      var(--ph-bg);
+  }
+  .photo__ph::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  .tone-clay .photo__ph {
+    --ph-bg: #c9a989;
+    --ph-fg: #3b2a1c;
+    --ph-light: rgb(255 226 180 / 0.7);
+  }
+  .tone-olive .photo__ph {
+    --ph-bg: #3a4532;
+    --ph-fg: #e3dccb;
+    --ph-light: rgb(214 196 140 / 0.35);
+  }
+  .tone-tomato .photo__ph {
+    --ph-bg: #9c4a33;
+    --ph-fg: #f6e7d8;
+    --ph-light: rgb(255 196 140 / 0.45);
+  }
+  .tone-ink .photo__ph {
+    --ph-bg: #2a2520;
+    --ph-fg: #d9cfbf;
+    --ph-light: rgb(232 180 110 / 0.3);
+  }
+  .tone-paper .photo__ph {
+    --ph-bg: #ddd1bd;
+    --ph-fg: #4a423a;
+    --ph-light: rgb(255 252 244 / 0.8);
+  }
+  .photo__corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 0 solid currentColor;
+    opacity: 0.55;
+    z-index: 1;
+  }
+  .photo__corner--tl { top: 8px; left: 8px; border-top-width: 1px; border-left-width: 1px; }
+  .photo__corner--tr { top: 8px; right: 8px; border-top-width: 1px; border-right-width: 1px; }
+  .photo__corner--bl { bottom: 8px; left: 8px; border-bottom-width: 1px; border-left-width: 1px; }
+  .photo__corner--br { bottom: 8px; right: 8px; border-bottom-width: 1px; border-right-width: 1px; }
+  .photo__ratio,
+  .photo__brief {
+    position: relative;
+    z-index: 1;
+  }
+  .photo__ratio {
+    align-self: flex-end;
+    font-size: 0.6875rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .photo__brief {
+    max-width: 26ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.15rem);
+    line-height: 1.25;
+    opacity: 0.9;
+  }
+  .photo__caption {
+    margin-top: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+    display: flex;
+    gap: 0.5rem;
+  }
+  .photo__caption::before {
+    content: '—';
+  }
+  :global(.on-dark) .photo__caption {
+    color: var(--on-olive-2);
+  }
+</style>

@@ -1,0 +1,317 @@
+---
+import { nav, site } from '../config/site';
+import { hoursGroups } from '../lib/hours';
+import Logo from './Logo.astro';
+import OpenStatus from './OpenStatus.astro';
+
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => path === href || path.startsWith(href + '/');
+const groups = hoursGroups();
+---
+
+<header class="header" data-header>
+  <div class="header__inner wrap">
+    <a class="header__logo" href="/" aria-label="Базилик — на главную">
+      <Logo />
+    </a>
+
+    <nav class="header__nav" aria-label="Основная навигация">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <a class="header__phone" href={`tel:${site.phone.tel}`}>
+        <span class="visually-hidden">Позвонить: </span>{site.phone.local}
+      </a>
+      <a class="btn header__book" href="/bron">Забронировать</a>
+      <button class="header__toggle" type="button" aria-haspopup="dialog" aria-controls="site-drawer" data-drawer-open>
+        <span class="header__toggle-lines" aria-hidden="true"></span>
+        <span class="visually-hidden">Открыть навигацию</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog class="drawer on-dark" id="site-drawer" aria-label="Навигация по сайту" data-drawer>
+  <div class="drawer__top">
+    <a href="/" class="drawer__logo"><Logo /></a>
+    <button class="drawer__close" type="button" data-drawer-close>
+      <span aria-hidden="true">✕</span><span class="visually-hidden">Закрыть навигацию</span>
+    </button>
+  </div>
+  <nav aria-label="Разделы сайта">
+    <ol class="drawer__list">
+      {
+        nav.map((item, i) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              <span class="drawer__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+  <div class="drawer__info">
+    <OpenStatus class="label" />
+    <p>
+      {site.address.short}, {site.city}<br />
+      <a href={`tel:${site.phone.tel}`}>{site.phone.international}</a>
+    </p>
+    <p class="muted">
+      {groups.map((g) => (<>{g.days} {g.time}<br /></>))}
+    </p>
+  </div>
+</dialog>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--paper);
+    background-image: inherit; /* та же фактура бумаги, что у страницы */
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-2) var(--ease);
+  }
+  .header.is-scrolled {
+    border-bottom-color: var(--line);
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-height: var(--header-h);
+  }
+  .header__logo {
+    text-decoration: none;
+    margin-right: auto;
+  }
+  .header__nav {
+    display: none;
+  }
+  .header__nav ul {
+    display: flex;
+    gap: clamp(1rem, 0.2rem + 1.4vw, 2rem);
+    list-style: none;
+    padding: 0;
+  }
+  .header__nav a {
+    position: relative;
+    font-size: 0.95rem;
+    text-decoration: none;
+    padding-block: 0.4rem;
+  }
+  .header__nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-2) var(--ease);
+  }
+  .header__nav a:hover::after,
+  .header__nav a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  .header__nav a[aria-current='page'] {
+    color: var(--tomato);
+  }
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .header__phone {
+    display: none;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .header__phone:hover {
+    color: var(--tomato);
+  }
+  .header__book {
+    display: none;
+    min-height: 2.75rem;
+    padding: 0.6rem 1.15rem;
+    font-size: 0.95rem;
+  }
+  .header__toggle {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -0.6rem;
+  }
+  .header__toggle-lines,
+  .header__toggle-lines::before {
+    display: block;
+    width: 1.6rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .header__toggle-lines {
+    position: relative;
+    transform: translateY(-4px);
+  }
+  .header__toggle-lines::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    width: 1.1rem;
+  }
+
+  @media (min-width: 720px) {
+    .header__book {
+      display: inline-flex;
+    }
+  }
+  @media (min-width: 900px) {
+    .header__phone {
+      display: inline;
+    }
+  }
+  @media (min-width: 1180px) {
+    .header__nav {
+      display: block;
+    }
+    .header__toggle {
+      display: none;
+    }
+    .header__logo {
+      margin-right: 0;
+    }
+    .header__nav {
+      margin-inline: auto;
+    }
+  }
+
+  /* Полноэкранная навигация */
+  .drawer {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0 var(--gutter) calc(1.5rem + env(safe-area-inset-bottom));
+    border: 0;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+  }
+  .drawer[open] {
+    display: flex;
+    animation: drawer-in var(--dur-2) var(--ease);
+  }
+  .drawer::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
+  @keyframes drawer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  }
+  .drawer__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-h);
+  }
+  .drawer__logo {
+    text-decoration: none;
+  }
+  .drawer__close {
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -0.6rem;
+    font-size: 1.25rem;
+  }
+  .drawer__list {
+    list-style: none;
+    padding: 1.5rem 0 2rem;
+    display: grid;
+  }
+  .drawer__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.55rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 1.4rem + 4vw, 3.5rem);
+    line-height: 1.05;
+    text-decoration: none;
+    border-bottom: 1px solid rgb(239 232 218 / 0.14);
+  }
+  .drawer__list a[aria-current='page'] {
+    color: var(--sage);
+    font-style: italic;
+  }
+  .drawer__num {
+    font-family: var(--font-text);
+    font-size: 0.75rem;
+    letter-spacing: var(--tracking-label);
+    color: var(--on-olive-2);
+    min-width: 1.5rem;
+  }
+  .drawer__info {
+    margin-top: auto;
+    display: grid;
+    gap: 0.75rem;
+    font-size: var(--fs-small);
+  }
+  .drawer__info a {
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const drawer = document.querySelector<HTMLDialogElement>('[data-drawer]');
+  const opener = document.querySelector<HTMLButtonElement>('[data-drawer-open]');
+
+  if (header) {
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (drawer && opener) {
+    opener.setAttribute('aria-expanded', 'false');
+    opener.addEventListener('click', () => {
+      drawer.showModal();
+      opener.setAttribute('aria-expanded', 'true');
+      document.documentElement.style.overflow = 'hidden';
+    });
+    drawer.querySelector('[data-drawer-close]')?.addEventListener('click', () => drawer.close());
+    drawer.addEventListener('close', () => {
+      opener.setAttribute('aria-expanded', 'false');
+      document.documentElement.style.overflow = '';
+      opener.focus();
+    });
+    // Клик по ссылке-якорю на той же странице тоже закрывает меню
+    drawer.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) drawer.close();
+    });
+    // Если окно расширили до десктопа — меню не нужно
+    matchMedia('(min-width: 1180px)').addEventListener('change', (e) => {
+      if (e.matches && drawer.open) drawer.close();
+    });
+  }
+</script>

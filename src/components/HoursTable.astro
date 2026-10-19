@@ -1,0 +1,70 @@
+---
+/** Часы работы; строка с сегодняшним днём подсвечивается в браузере. */
+import { hoursGroups } from '../lib/hours';
+
+interface Props {
+  full?: boolean;
+  class?: string;
+}
+const { full = false, class: className } = Astro.props;
+const groups = hoursGroups();
+---
+
+<dl class:list={['hours', className]} data-hours>
+  {
+    groups.map((g) => (
+      <div class="hours__row" data-weekdays={g.weekdays.join(',')}>
+        <dt>
+          {full ? <span class="hours__days">{g.daysFull}</span> : g.days}
+          <span class="hours__today">сегодня</span>
+        </dt>
+        <dd>{g.time}</dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .hours {
+    display: grid;
+  }
+  .hours__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--line);
+  }
+  :global(.on-dark) .hours__row {
+    border-bottom-color: rgb(239 232 218 / 0.18);
+  }
+  .hours__days::first-letter {
+    text-transform: uppercase;
+  }
+  .hours__today {
+    display: none;
+    margin-left: 0.6rem;
+    font-size: 0.6875rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--tomato);
+  }
+  :global(.on-dark) .hours__today {
+    color: var(--sage);
+  }
+  .hours__row.is-today dd {
+    font-weight: 600;
+  }
+  .hours__row.is-today .hours__today {
+    display: inline;
+  }
+</style>
+
+<script>
+  import { zonedNow } from '../lib/hours';
+  const { weekday } = zonedNow();
+  for (const row of document.querySelectorAll<HTMLElement>('[data-hours] [data-weekdays]')) {
+    if (row.dataset.weekdays!.split(',').map(Number).includes(weekday)) row.classList.add('is-today');
+  }
+</script>

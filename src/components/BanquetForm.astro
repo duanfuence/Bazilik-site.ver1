@@ -1,0 +1,107 @@
+---
+/** Заявка на банкет или мероприятие. Ничего не обещает: администратор перезванивает и обсуждает детали. */
+import Field from './Field.astro';
+import { site } from '../config/site';
+import { occasions } from '../data/events';
+---
+
+<form class="form" action="/api/banquet" method="post" data-banquet-form>
+  <div class="form__row form__row--2">
+    <Field id="q-date" name="date" label="Предполагаемая дата">
+      <input class="input" id="q-date" name="date" type="date" required />
+    </Field>
+    <Field id="q-guests" name="guests" label="Примерное число гостей">
+      <input class="input" id="q-guests" name="guests" type="number" inputmode="numeric" min="1" max="1000" required placeholder="Например, 25" />
+    </Field>
+  </div>
+
+  <Field id="q-occasion" name="occasion" label="Повод">
+    <select class="input" id="q-occasion" name="occasion">
+      <option value="">Не выбран</option>
+      {occasions.map((o) => <option value={o.title}>{o.title}</option>)}
+      <option value="Другое">Другое — расскажу в комментарии</option>
+    </select>
+  </Field>
+
+  <div class="form__row form__row--2">
+    <Field id="q-name" name="name" label="Имя">
+      <input class="input" id="q-name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="60" />
+    </Field>
+    <Field id="q-phone" name="phone" label="Телефон">
+      <input class="input" id="q-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="+7 900 000-00-00" />
+    </Field>
+  </div>
+
+  <Field id="q-comment" name="comment" label="Комментарий" hint="Формат, время начала, пожелания по меню — всё, что уже известно">
+    <textarea class="input" id="q-comment" name="comment" maxlength="1000" rows="4" aria-describedby="q-comment-hint"></textarea>
+  </Field>
+
+  <div class="hp" aria-hidden="true">
+    <label for="q-website">Не заполняйте это поле</label>
+    <input id="q-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <Field id="q-consent" name="consent" label="" class="field--consent">
+    <label class="check">
+      <input id="q-consent" name="consent" type="checkbox" required />
+      <span>Согласен(на) на обработку персональных данных для связи по заявке — <a href="/politika-konfidencialnosti" target="_blank">политика конфиденциальности</a></span>
+    </label>
+  </Field>
+
+  <div class="notice notice--error" role="alert" tabindex="-1" data-form-error hidden>
+    <strong>Заявка не отправлена</strong>
+    <p></p>
+  </div>
+
+  <button class="btn btn--ink btn--block" type="submit">
+    <span class="spinner" aria-hidden="true"></span>
+    <span data-label="Отправить заявку на банкет">Отправить заявку на банкет</span>
+  </button>
+</form>
+
+<section class="success" tabindex="-1" data-banquet-success hidden aria-labelledby="q-success-title">
+  <svg class="success__mark" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M12 20.5l5.5 5.5L29 14.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg>
+  <h3 id="q-success-title" class="h3">Заявка на банкет получена</h3>
+  <p class="success__id">№ <span data-success-id></span></p>
+  <p data-success-summary></p>
+  <p>Администратор свяжется с вами по номеру <span data-success-phone></span>, чтобы обсудить формат, меню и подтвердить дату. До этого разговора дата не закреплена. Вопросы — по телефону <a href={`tel:${site.phone.tel}`}>{site.phone.local}</a>.</p>
+</section>
+
+<style>
+  .field--consent :global(.field__label) {
+    display: none;
+  }
+</style>
+
+<script>
+  import { setupRequestForm, humanDate } from '../scripts/request-form';
+  import { validateBanquet, formatPhone, normalizePhone } from '../lib/validation';
+  import { zonedNow } from '../lib/hours';
+
+  const form = document.querySelector<HTMLFormElement>('[data-banquet-form]');
+  const success = document.querySelector<HTMLElement>('[data-banquet-success]');
+  if (form && success) {
+    const date = form.querySelector<HTMLInputElement>('input[name="date"]')!;
+    date.min = zonedNow().date;
+    const phone = form.querySelector<HTMLInputElement>('input[name="phone"]')!;
+    phone.addEventListener('blur', () => {
+      const n = normalizePhone(phone.value);
+      if (n) phone.value = formatPhone(n);
+    });
+
+    setupRequestForm(form, {
+      validate: validateBanquet,
+      onSuccess(id, data) {
+        success.querySelector('[data-success-id]')!.textContent = id;
+        const occasion = data.occasion ? ` · ${data.occasion}` : '';
+        success.querySelector('[data-success-summary]')!.textContent =
+          `${humanDate(String(data.date))} · гостей: ${data.guests}${occasion}`;
+        const n = normalizePhone(String(data.phone));
+        success.querySelector('[data-success-phone]')!.textContent = n ? formatPhone(n) : String(data.phone);
+        form.hidden = true;
+        success.hidden = false;
+        success.focus();
+      },
+    });
+  }
+</script>

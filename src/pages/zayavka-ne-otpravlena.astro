@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+
+<Base title="Заявка не отправлена" description="Не удалось отправить заявку. Позвоните нам." noindex>
+  <section class="wrap result">
+    <p class="index label"><span class="index__num">—</span> Заявка</p>
+    <h1 class="h1">Заявку <span class="accent">не удалось отправить</span></h1>
+    <p class="lead">
+      Возможно, в форме была ошибка или онлайн-приём сейчас недоступен. Вернитесь назад и проверьте данные — или позвоните, и администратор
+      оформит всё по телефону.
+    </p>
+    <a class="btn" href={`tel:${site.phone.tel}`}>Позвонить: {site.phone.local}</a>
+    <a class="arrow-link" href="/bron">Вернуться к бронированию</a>
+  </section>
+</Base>
+
+<style>
+  .result {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    padding-block: 1.25rem var(--space-6);
+  }
+</style>
