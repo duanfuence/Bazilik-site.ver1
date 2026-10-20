@@ -82,9 +82,9 @@ export const site = {
    * в мобильном меню и на странице контактов. Пустой href — сеть не показывается.
    */
   social: [
-    { id: 'instagram', label: 'Instagram', href: '' }, // TODO: например https://www.instagram.com/имя_аккаунта
-    { id: 'telegram', label: 'Telegram', href: '' }, // TODO: например https://t.me/имя_канала
-    { id: 'vk', label: 'ВКонтакте', href: '' }, // TODO: например https://vk.com/имя_сообщества
+    { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/bazilikrest/' },
+    { id: 'telegram', label: 'Telegram', href: 'https://t.me/bazilikrest' },
+    { id: 'vk', label: 'ВКонтакте', href: 'https://vk.ru/bazilikrest' },
   ] as SocialLink[],
 
   /**
