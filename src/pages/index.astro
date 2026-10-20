@@ -35,7 +35,6 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
       <div class="cover__grid">
         <h1 id="cover-title" class="cover__title">
           <span class="h-mega cover__word">Базилик</span>
-          <span class="cover__sub accent">на Селезнёвской</span>
         </h1>
 
         <Photo name="heroHall" class="cover__hall" priority sizes="(min-width: 1024px) 38vw, 88vw" caption="Зал вечером" />
@@ -199,8 +198,19 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
 
 <style>
   /* ---------- Обложка ---------- */
+  /*
+   * Первый экран рассчитан от высоты окна, а не только от ширины:
+   * главное фото сохраняет пропорции 4:5 и целиком, с подписью, помещается под шапкой.
+   * --fold — видимая высота под шапкой; на телефоне учитываем ещё нижнюю панель действий.
+   */
   .cover {
+    --fold: calc(100vh - var(--header-h));
     padding-block: 1.25rem var(--space-5);
+  }
+  @supports (height: 100svh) {
+    .cover {
+      --fold: calc(100svh - var(--header-h));
+    }
   }
   .cover__meta {
     display: flex;
@@ -227,15 +237,14 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   .cover__word {
     display: block;
     margin-left: -0.04em;
-  }
-  .cover__sub {
-    font-size: clamp(1.6rem, 1.1rem + 2.6vw, 3.6rem);
-    letter-spacing: -0.01em;
-    margin-top: 0.15em;
-    padding-left: 0.1em;
+    /* на невысоких экранах название не съедает место у фотографий */
+    font-size: min(var(--fs-mega), 26svh);
   }
   .cover__hall {
     grid-column: 3 / -1;
+    justify-self: end;
+    /* над фото — мета-строка и название, под ним — подпись и нижняя панель телефона */
+    width: clamp(12rem, calc((var(--fold) - 18rem) * 0.8), 100%);
   }
   .cover__dish {
     display: none;
@@ -265,6 +274,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   }
   @media (min-width: 900px) {
     .cover__grid {
+      --hall-offset: clamp(1rem, 5svh, 4rem);
       grid-template-rows: auto auto 1fr;
     }
     .cover__title {
@@ -272,26 +282,25 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
       grid-row: 1;
       align-self: start;
     }
-    .cover__sub {
-      padding-left: 22%;
-    }
     .cover__hall {
       grid-column: 8 / -1;
       grid-row: 1 / 4;
-      margin-top: clamp(3rem, 7vw, 8rem);
+      margin-top: var(--hall-offset);
+      /* 10rem — мета-строка, отступы и подпись к кадру */
+      width: clamp(14rem, calc((var(--fold) - 10rem - var(--hall-offset)) * 0.8), 100%);
     }
     .cover__dish {
       display: block;
       grid-column: 1 / 4;
       grid-row: 2 / 4;
       align-self: start;
-      margin-top: 2.5rem;
+      margin-top: clamp(1rem, 4svh, 2.5rem);
     }
     .cover__intro {
       grid-column: 4 / 8;
       grid-row: 2 / 4;
       align-self: start;
-      margin-top: 2.5rem;
+      margin-top: clamp(1rem, 4svh, 2.5rem);
     }
   }
 

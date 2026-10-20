@@ -2,6 +2,7 @@
 import { nav, routeLinks, site } from '../config/site';
 import { hoursGroups } from '../lib/hours';
 import Logo from './Logo.astro';
+import SocialLinks from './SocialLinks.astro';
 
 const groups = hoursGroups();
 const year = new Date().getFullYear();
@@ -13,6 +14,7 @@ const year = new Date().getFullYear();
       <div class="footer__brand">
         <Logo size="lg" />
         <p class="muted">Ресторан в Тамбове</p>
+        <SocialLinks class="footer__social" />
       </div>
 
       <div class="footer__col">
@@ -38,11 +40,6 @@ const year = new Date().getFullYear();
         <p class="label muted">Телефон</p>
         <a class="footer__phone" href={`tel:${site.phone.tel}`}>{site.phone.local}</a>
         <p class="muted footer__small">{site.phone.international}</p>
-        {site.social.length > 0 && (
-          <ul class="footer__social">
-            {site.social.map((s) => (<li><a href={s.href} target="_blank" rel="noopener">{s.label}</a></li>))}
-          </ul>
-        )}
       </div>
     </div>
 
@@ -80,6 +77,9 @@ const year = new Date().getFullYear();
   .footer__brand p {
     margin-top: 0.75rem;
   }
+  .footer__social {
+    margin-top: 1.5rem;
+  }
   .footer__col {
     display: grid;
     gap: 0.6rem;
@@ -88,8 +88,7 @@ const year = new Date().getFullYear();
   address {
     font-style: normal;
   }
-  .footer__routes,
-  .footer__social {
+  .footer__routes {
     list-style: none;
     padding: 0;
     display: flex;
@@ -97,12 +96,10 @@ const year = new Date().getFullYear();
     gap: 0.25rem 1rem;
     font-size: var(--fs-small);
   }
-  .footer__routes a,
-  .footer__social a {
+  .footer__routes a {
     color: var(--on-olive-2);
   }
-  .footer__routes a:hover,
-  .footer__social a:hover {
+  .footer__routes a:hover {
     color: var(--on-olive);
   }
   .footer__hours div {

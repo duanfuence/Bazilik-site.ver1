@@ -2,7 +2,8 @@
 import Base from '../layouts/Base.astro';
 import HoursTable from '../components/HoursTable.astro';
 import OpenStatus from '../components/OpenStatus.astro';
-import { routeLinks, site } from '../config/site';
+import SocialLinks from '../components/SocialLinks.astro';
+import { routeLinks, site, socialLinks } from '../config/site';
 import { restaurantSchema } from '../lib/schema';
 
 const origin = Astro.site ?? new URL(Astro.url.origin);
@@ -58,10 +59,8 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
         <li><a class="btn btn--ghost" href="/bankety#zayavka">Заявка на банкет</a></li>
       </ul>
       {
-        site.social.length > 0 ? (
-          <ul class="contacts__social">
-            {site.social.map((s) => (<li><a class="arrow-link" href={s.href} target="_blank" rel="noopener">{s.label}</a></li>))}
-          </ul>
+        socialLinks.length > 0 ? (
+          <SocialLinks variant="list" class="contacts__social" />
         ) : (
           <p class="placeholder-note">Соцсети и мессенджеры ресторана появятся здесь, когда будут переданы ссылки.</p>
         )
@@ -142,13 +141,15 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
     color: var(--tomato);
     padding-left: 0.4rem;
   }
-  .contacts__actions,
-  .contacts__social {
+  .contacts__actions {
     list-style: none;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
+  }
+  .contacts__social {
+    margin-top: 0.75rem;
   }
   .contacts__map iframe {
     width: 100%;

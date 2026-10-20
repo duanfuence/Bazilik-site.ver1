@@ -1,0 +1,128 @@
+---
+/**
+ * Ссылки на соцсети ресторана. Адреса — в src/config/site.ts (social).
+ * Выводятся только заполненные сети; если не заполнено ничего, компонент ничего не рисует.
+ *
+ * variant="icons" — круглые кнопки-иконки 44×44 (подвал, мобильное меню);
+ * variant="list"  — иконка с названием (страница контактов).
+ * Контур Telegram — по мотивам Tabler Icons (MIT).
+ */
+import { socialLinks } from '../config/site';
+
+interface Props {
+  variant?: 'icons' | 'list';
+  class?: string;
+}
+
+const { variant = 'icons', class: className } = Astro.props;
+---
+
+{
+  socialLinks.length > 0 && (
+    <ul class:list={['social', `social--${variant}`, className]} aria-label="Ресторан в соцсетях">
+      {socialLinks.map((s) => (
+        <li>
+          <a
+            class="social__link"
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={variant === 'icons' ? s.label : undefined}
+            aria-label={variant === 'icons' ? `${s.label} ресторана «Базилик» (откроется в новой вкладке)` : undefined}
+          >
+            <svg class="social__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              {s.id === 'instagram' && (
+                <g fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke-width="0.9" />
+                </g>
+              )}
+              {s.id === 'telegram' && (
+                <path
+                  d="M15 10l-4 4 6 6 4-16-18 7 4 2 2 6 3-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                />
+              )}
+              {s.id === 'vk' && (
+                <path
+                  fill="currentColor"
+                  transform="translate(12 12.4) scale(1.12) translate(-12 -12.4)"
+                  d="M19.38 17.12h-1.75c-.66 0-.86-.52-2.05-1.72-1.03-1-1.49-1.14-1.74-1.14-.36 0-.46.1-.46.6v1.57c0 .42-.13.68-1.25.68-1.85 0-3.9-1.12-5.34-3.2C4.62 10.86 4.03 8.57 4.03 8.1c0-.25.1-.5.59-.5h1.75c.44 0 .6.21.78.68.86 2.49 2.3 4.68 2.9 4.68.22 0 .32-.1.32-.66V9.72c-.07-1.19-.7-1.29-.7-1.71 0-.2.17-.41.44-.41h2.75c.37 0 .5.2.5.64v3.47c0 .37.17.51.27.51.22 0 .41-.14.81-.54 1.26-1.41 2.15-3.58 2.15-3.58.12-.25.32-.49.76-.49h1.75c.52 0 .64.27.52.64-.22 1.02-2.35 4.03-2.35 4.03-.19.3-.26.44 0 .78.18.25.8.78 1.2 1.25.75.85 1.32 1.56 1.47 2.05.17.49-.08.74-.57.74Z"
+                />
+              )}
+            </svg>
+            {variant === 'list' && (
+              <span>
+                {s.label}
+                <span class="visually-hidden"> (откроется в новой вкладке)</span>
+              </span>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .social {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .social__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    text-decoration: none;
+    transition:
+      background-color var(--dur-1) var(--ease),
+      border-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease);
+  }
+  .social__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+  }
+
+  /* Круглые кнопки — тот же язык, что у стрелок лент меню */
+  .social--icons .social__link {
+    width: 2.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+  }
+  .social--icons .social__link:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  :global(.on-dark) .social--icons .social__link {
+    border-color: rgb(239 232 218 / 0.4);
+  }
+  :global(.on-dark) .social--icons .social__link:hover {
+    background: var(--on-olive);
+    border-color: var(--on-olive);
+    color: var(--olive);
+  }
+
+  /* Иконка с подписью */
+  .social--list {
+    gap: 0.25rem 1.5rem;
+  }
+  .social--list .social__link {
+    font-weight: 500;
+  }
+  .social--list .social__link:hover {
+    color: var(--tomato);
+  }
+</style>

@@ -1,5 +1,5 @@
 /** Структурированные данные schema.org — только подтверждённые факты, без рейтингов и отзывов. */
-import { site } from '../config/site.ts';
+import { site, socialLinks } from '../config/site.ts';
 import { displayTime } from './hours.ts';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -31,6 +31,6 @@ export function restaurantSchema(origin: URL) {
     }),
     hasMenu: new URL('/menu', origin).href,
     acceptsReservations: true,
-    ...(site.social.length ? { sameAs: site.social.map((s) => s.href) } : {}),
+    ...(socialLinks.length ? { sameAs: socialLinks.map((s) => s.href) } : {}),
   };
 }

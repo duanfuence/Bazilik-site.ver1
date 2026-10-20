@@ -3,6 +3,7 @@ import { nav, site } from '../config/site';
 import { hoursGroups } from '../lib/hours';
 import Logo from './Logo.astro';
 import OpenStatus from './OpenStatus.astro';
+import SocialLinks from './SocialLinks.astro';
 
 const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
 const isCurrent = (href: string) => path === href || path.startsWith(href + '/');
@@ -72,6 +73,7 @@ const groups = hoursGroups();
     <p class="muted">
       {groups.map((g) => (<>{g.days} {g.time}<br /></>))}
     </p>
+    <SocialLinks />
   </div>
 </dialog>
 

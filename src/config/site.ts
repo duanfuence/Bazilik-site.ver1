@@ -6,6 +6,15 @@
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 — воскресенье, как в Date#getDay
 
+export type SocialId = 'instagram' | 'telegram' | 'vk';
+
+export interface SocialLink {
+  id: SocialId;
+  label: string;
+  /** Полная ссылка https://…; пустая строка — сеть скрыта */
+  href: string;
+}
+
 export interface DayHours {
   /** «HH:MM» */
   open: string;
@@ -67,8 +76,16 @@ export const site = {
     maxGuests: 12,
   },
 
-  /** Ссылки на соцсети. Пустой массив — блок не показывается. */
-  social: [] as { label: string; href: string }[],
+  /**
+   * Соцсети ресторана — единственное место, где задаются адреса.
+   * Заполните href полной ссылкой (https://…) — иконка появится в подвале,
+   * в мобильном меню и на странице контактов. Пустой href — сеть не показывается.
+   */
+  social: [
+    { id: 'instagram', label: 'Instagram', href: '' }, // TODO: например https://www.instagram.com/имя_аккаунта
+    { id: 'telegram', label: 'Telegram', href: '' }, // TODO: например https://t.me/имя_канала
+    { id: 'vk', label: 'ВКонтакте', href: '' }, // TODO: например https://vk.com/имя_сообщества
+  ] as SocialLink[],
 
   /**
    * Встраиваемая карта (например, конструктор Яндекс Карт).
@@ -76,6 +93,25 @@ export const site = {
    */
   mapEmbedUrl: null as string | null,
 } as const;
+
+/** Домены, на которые должна вести ссылка каждой сети (защита от опечаток при заполнении). */
+export const socialHosts: Record<SocialId, string[]> = {
+  instagram: ['instagram.com', 'www.instagram.com'],
+  telegram: ['t.me', 'telegram.me'],
+  vk: ['vk.com', 'www.vk.com', 'vk.ru', 'www.vk.ru'],
+};
+
+export function isValidSocialHref(id: SocialId, href: string): boolean {
+  try {
+    const url = new URL(href);
+    return url.protocol === 'https:' && socialHosts[id].includes(url.hostname) && url.pathname.length > 1;
+  } catch {
+    return false;
+  }
+}
+
+/** Заполненные соцсети — только они выводятся на сайте. */
+export const socialLinks: SocialLink[] = site.social.filter((s) => s.href.trim() !== '');
 
 const addressQuery = encodeURIComponent(`${site.address.locality}, ${site.address.street}`);
 
