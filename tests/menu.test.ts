@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { formatPrice, menu, menuGroups, priceLabel } from '../src/data/menu.ts';
+import { formatPrice, homePreviewIds, menu, menuGroups, priceLabel } from '../src/data/menu.ts';
 
 const items = menu.flatMap((c) => c.items.map((item) => ({ ...item, category: c.title })));
 
@@ -47,4 +47,11 @@ test('названия внутри раздела не повторяются',
 test('цены форматируются по-русски', () => {
   assert.equal(formatPrice(1150), '1 150 ₽');
   assert.equal(priceLabel({ name: 'x', prices: [{ volume: '150 мл', price: 490 }, { volume: '750 мл', price: 2450 }] }), '490 / 2 450 ₽');
+});
+
+test('разделы для ленты на главной существуют и не пусты', () => {
+  for (const id of homePreviewIds) {
+    const c = menu.find((x) => x.id === id);
+    assert.ok(c && c.items.length >= 2, `раздел ${id}`);
+  }
 });

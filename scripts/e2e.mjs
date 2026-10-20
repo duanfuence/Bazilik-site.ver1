@@ -192,12 +192,13 @@ assert.ok(!(await page.locator('[data-drawer]').isVisible()));
 assert.equal(await page.evaluate(() => document.activeElement?.hasAttribute('data-drawer-open')), true);
 ok('мобильная навигация: открывается, закрывается по Esc, фокус возвращается на кнопку');
 
-// Лента меню: кнопки листают ленту, страница не едет вбок
+// Лента «Кухня в деталях» на главной: кнопки листают ленту, страница не едет вбок
 await page.setViewportSize({ width: 1440, height: 900 });
-await page.goto(base + '/menu');
-const track = page.locator('#strip-meat');
+await page.goto(base + '/');
+const track = page.locator('#strip-home');
+await track.scrollIntoViewIfNeeded();
 const start = await track.evaluate((el) => el.scrollLeft);
-await page.click('[aria-controls="strip-meat"][data-strip-next]');
+await page.click('[aria-controls="strip-home"][data-strip-next]');
 await page.waitForTimeout(700);
 const moved = await track.evaluate((el) => el.scrollLeft);
 assert.ok(moved > start, 'лента прокрутилась');
@@ -206,7 +207,18 @@ await track.focus();
 await page.keyboard.press('ArrowRight');
 await page.waitForTimeout(700);
 assert.ok((await track.evaluate((el) => el.scrollLeft)) > moved, 'стрелка на клавиатуре листает ленту');
-ok('лента меню: листается кнопками и клавишей →, страница не прокручивается по горизонтали');
+ok('лента на главной: листается кнопками и клавишей →, страница не прокручивается по горизонтали');
+
+// Страница меню: все разделы — списки, лент нет
+await page.goto(base + '/menu');
+const menuShape = await page.evaluate(() => ({
+  strips: document.querySelectorAll('[data-strip]').length,
+  sections: document.querySelectorAll('[data-cat]').length,
+  listed: document.querySelectorAll('[data-cat] .mlist').length,
+}));
+assert.equal(menuShape.strips, 0);
+assert.equal(menuShape.listed, menuShape.sections);
+ok(`меню: все ${menuShape.sections} разделов — списки, горизонтальных лент нет`);
 
 // Навигация по категориям
 await page.click('[data-cat-link="desserts"]');

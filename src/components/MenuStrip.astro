@@ -12,8 +12,6 @@ interface Props {
   id: string;
   label: string;
   items: (MenuItem & { kicker?: string })[];
-  /** Уровень заголовка позиции: h3 на главной, h4 внутри раздела меню */
-  itemHeading?: 'h3' | 'h4';
   /**
    * Подогнать ленту под высоту экрана: кадры масштабируются от --strip-h,
    * которую задаёт родитель (высота самого высокого кадра), описания — в две строки.
@@ -21,8 +19,7 @@ interface Props {
   fit?: boolean;
 }
 
-const { id, label, items, itemHeading = 'h3', fit = false } = Astro.props;
-const ItemHeading = itemHeading;
+const { id, label, items, fit = false } = Astro.props;
 
 // Ритм коллажа повторяется каждые 5 кадров: высокий, малый ниже, широкий, узкий, квадрат.
 const variants = [
@@ -67,7 +64,7 @@ const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
                   {item.kicker ?? String(i + 1).padStart(2, '0')}
                   {item.isNew && <span class="tag">новинка</span>}
                 </p>
-                <ItemHeading class="strip__name">{item.name}</ItemHeading>
+                <h3 class="strip__name">{item.name}</h3>
                 {item.description && <p class="strip__desc">{item.description}</p>}
                 <p class="strip__price">
                   <span>{priceLabel(item)}</span>

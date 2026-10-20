@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageIntro from '../components/PageIntro.astro';
-import MenuStrip from '../components/MenuStrip.astro';
 import MenuList from '../components/MenuList.astro';
 import { allergyNote, menu, menuGroups } from '../data/menu';
 
@@ -18,7 +17,7 @@ const groups = menuGroups
 >
   <PageIntro label="Меню">
     <Fragment slot="title">Меню <span class="accent">ресторана</span></Fragment>
-    <p>Разделы с фотографиями листаются вправо — пальцем, кнопками или стрелками на клавиатуре.</p>
+    <p>Кухня, напитки, бар и винная карта — с составом блюд, выходом и ценами.</p>
     <p class="menu-allergy">{allergyNote}</p>
   </PageIntro>
 
@@ -54,19 +53,15 @@ const groups = menuGroups
           {g.note && <p class="mgroup__note muted">{g.note}</p>}
         </div>
         {g.categories.map((c) => (
-          <section class:list={['cat', `cat--${c.layout}`]} id={c.id} aria-labelledby={`${c.id}-title`} data-cat>
+          <section class="cat" id={c.id} aria-labelledby={`${c.id}-title`} data-cat>
             <div class="wrap cat__head">
               <p class="cat__num" aria-hidden="true">{num(c.id)}</p>
               <h3 id={`${c.id}-title`} class="h2 cat__title">{c.title}</h3>
               {c.note && <p class="cat__note">{c.note}</p>}
             </div>
-            {c.layout === 'gallery' ? (
-              <MenuStrip id={c.id} label={c.title} items={c.items} itemHeading="h4" />
-            ) : (
-              <div class="wrap">
-                <MenuList items={c.items} />
-              </div>
-            )}
+            <div class="wrap">
+              <MenuList items={c.items} />
+            </div>
             {c.footnotes && (
               <div class="wrap cat__foot">
                 {c.footnotes.map((f) => <p>{f}</p>)}
@@ -217,9 +212,6 @@ const groups = menuGroups
     font-size: var(--fs-small);
     font-style: italic;
     color: var(--ink-2);
-  }
-  .cat--gallery .cat__head {
-    margin-bottom: 1rem;
   }
   .menu-end {
     display: flex;

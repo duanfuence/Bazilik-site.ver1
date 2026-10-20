@@ -6,11 +6,10 @@
  *   — цена: поле price (в рублях); у напитков с несколькими объёмами — prices;
  *   — выход: portion («550 г», «150/40 г», «40 мл»);
  *   — новинка: isNew: true — рядом с названием появится пометка «новинка»;
- *   — фото блюда: photo (импорт из src/assets/…), пока нет — показывается заглушка.
+ *   — фото блюда: photo (импорт из src/assets/…) — показывается в ленте-превью на главной.
  *
- * layout:
- *   'gallery' — горизонтальная лента-коллаж с фотографиями (паста, рыба, мясо, десерты);
- *   'list'    — типографский список с ценами.
+ * На странице /menu все разделы — типографские списки с ценами.
+ * Какие разделы попадают в ленту «Кухня в деталях» на главной — homePreviewIds.
  */
 import type { ImageMetadata } from 'astro';
 
@@ -40,7 +39,6 @@ export interface MenuCategory {
   id: string;
   title: string;
   group: MenuGroupId;
-  layout: 'gallery' | 'list';
   /** Пояснение под заголовком раздела */
   note?: string;
   /** Примечания после списка */
@@ -55,6 +53,9 @@ export const menuGroups: { id: MenuGroupId; title: string; note?: string }[] = [
   { id: 'wine', title: 'Вина' },
 ];
 
+/** Разделы для ленты-превью на главной (по две позиции из каждого) */
+export const homePreviewIds = ['pasta', 'fish', 'meat', 'desserts'];
+
 /** Из печатного меню ресторана */
 export const allergyNote = 'Если у вас есть аллергия на какой-либо продукт, пожалуйста, предупредите официанта.';
 
@@ -63,7 +64,6 @@ export const menu: MenuCategory[] = [
     id: 'starters',
     title: 'Стартеры',
     group: 'kitchen',
-    layout: 'list',
     items: [
       {
         name: 'Винный гастрономический сет',
@@ -161,7 +161,6 @@ export const menu: MenuCategory[] = [
     id: 'salads',
     title: 'Салаты',
     group: 'kitchen',
-    layout: 'list',
     items: [
       {
         name: 'Салат из свежих овощей с рассольным сыром, пшеничными гренками и каперсами',
@@ -247,7 +246,6 @@ export const menu: MenuCategory[] = [
     id: 'pasta',
     title: 'Паста',
     group: 'kitchen',
-    layout: 'gallery',
     items: [
       {
         name: 'Паста с морепродуктами в сливочном соусе',
@@ -285,7 +283,6 @@ export const menu: MenuCategory[] = [
     id: 'soups',
     title: 'Супы',
     group: 'kitchen',
-    layout: 'list',
     note: 'Если у вас есть аллергия на какой-либо продукт, пожалуйста, предупредите официанта.',
     items: [
       {
@@ -344,7 +341,6 @@ export const menu: MenuCategory[] = [
     id: 'fish',
     title: 'Блюда из рыбы',
     group: 'kitchen',
-    layout: 'gallery',
     items: [
       {
         name: 'Запечённые мидии',
@@ -389,7 +385,6 @@ export const menu: MenuCategory[] = [
     id: 'meat',
     title: 'Горячие блюда из мяса',
     group: 'kitchen',
-    layout: 'gallery',
     items: [
       {
         name: 'Говяжий язык на гриле с молодым картофелем, розмарином и перечным соусом',
@@ -434,7 +429,6 @@ export const menu: MenuCategory[] = [
     id: 'grill',
     title: 'Гриль',
     group: 'kitchen',
-    layout: 'list',
     footnotes: ['Рекомендуемая степень прожарки — medium. Стейк подаётся с томленым красным луком и кукурузой гриль.', 'Шашлык подаётся с лавашом, маринованным луком, соусом из томатов и салатом коул-слоу.'],
     items: [
       { name: 'Рибай', portion: '100 г', price: 850 },
@@ -453,7 +447,6 @@ export const menu: MenuCategory[] = [
     id: 'sides',
     title: 'Гарниры',
     group: 'kitchen',
-    layout: 'list',
     items: [
       { name: 'Картофель фри с пармезаном', portion: '150 г', price: 250 },
       { name: 'Молодой картофель с розмарином', portion: '200 г', price: 250 },
@@ -476,7 +469,6 @@ export const menu: MenuCategory[] = [
     id: 'butter',
     title: 'Ароматное масло',
     group: 'kitchen',
-    layout: 'list',
     note: 'К маслу подаются гренки из чиабатты.',
     items: [
       { name: 'С вялеными томатами и травами', portion: '40 г', price: 180 },
@@ -490,7 +482,6 @@ export const menu: MenuCategory[] = [
     id: 'sauces',
     title: 'Соусы',
     group: 'kitchen',
-    layout: 'list',
     items: [
       { name: 'Сливочно-грибной', portion: '40 г', price: 180 },
       { name: 'Песто', portion: '40 г', price: 180 },
@@ -510,7 +501,6 @@ export const menu: MenuCategory[] = [
     id: 'bread',
     title: 'Хлеб',
     group: 'kitchen',
-    layout: 'list',
     items: [
       {
         name: 'Хлебная корзина',
@@ -523,7 +513,6 @@ export const menu: MenuCategory[] = [
     id: 'desserts',
     title: 'Десерты',
     group: 'kitchen',
-    layout: 'gallery',
     items: [
       { name: 'Сырники с соусом из вишни и сливочным кремом', portion: '280 г', price: 490 },
       { name: 'Морковный торт со сливочным кремом и сезонной ягодой', portion: '170 г', price: 470 },
@@ -544,7 +533,6 @@ export const menu: MenuCategory[] = [
     id: 'mors',
     title: 'Морс',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Ягодный', prices: [{ volume: '200 мл', price: 150 }, { volume: '1000 мл', price: 600 }] },
       { name: 'Клюквенный', prices: [{ volume: '200 мл', price: 150 }, { volume: '1000 мл', price: 600 }] },
@@ -555,7 +543,6 @@ export const menu: MenuCategory[] = [
     id: 'lemonades',
     title: 'Лимонады',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Классический', prices: [{ volume: '200 мл', price: 200 }, { volume: '1000 мл', price: 600 }] },
       { name: 'Маракуйя — бузина', prices: [{ volume: '200 мл', price: 200 }, { volume: '1000 мл', price: 600 }] },
@@ -579,7 +566,6 @@ export const menu: MenuCategory[] = [
     id: 'fresh',
     title: 'Фреш',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Апельсин', portion: '200 мл', price: 370 },
       { name: 'Апельсин-грейпфрут', portion: '200 мл', price: 390 },
@@ -590,7 +576,6 @@ export const menu: MenuCategory[] = [
     id: 'soft',
     title: 'Прохладительные напитки',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Кола', portion: '330 мл', price: 250 },
       {
@@ -605,7 +590,6 @@ export const menu: MenuCategory[] = [
     id: 'coffee',
     title: 'Кофе',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Эспрессо', price: 200 },
       { name: 'Американо', price: 200 },
@@ -620,7 +604,6 @@ export const menu: MenuCategory[] = [
     id: 'tea',
     title: 'Чай',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Ассам', portion: '700 мл', price: 300 },
       { name: 'Эрл грей', portion: '700 мл', price: 300 },
@@ -638,7 +621,6 @@ export const menu: MenuCategory[] = [
     id: 'tisane',
     title: 'Тизан',
     group: 'drinks',
-    layout: 'list',
     items: [
       { name: 'Малина — розмарин', portion: '700 мл', price: 400 },
       { name: 'Облепиха — апельсин', portion: '700 мл', price: 400 },
@@ -651,7 +633,6 @@ export const menu: MenuCategory[] = [
     id: 'cocktails',
     title: 'Коктейли',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Апероль шприц', portion: '280 мл', price: 500, description: 'освежающий цитрусовый аперитив' },
       { name: 'Клубничный шприц', portion: '280 мл', price: 500, description: 'игристый коктейль с клубникой' },
@@ -669,7 +650,6 @@ export const menu: MenuCategory[] = [
     id: 'beer',
     title: 'Пиво и сидр',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Крон бланш', portion: '450 мл', price: 360 },
       { name: 'Оттингер пилс', portion: '400 мл', price: 350, description: 'Германия, светлое фильтрованное' },
@@ -688,7 +668,6 @@ export const menu: MenuCategory[] = [
     id: 'nastoyki',
     title: 'Авторские настойки',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Лимончелло', portion: '40 мл', price: 250 },
       { name: 'Водка на клюкве', portion: '40 мл', price: 250 },
@@ -705,7 +684,6 @@ export const menu: MenuCategory[] = [
     id: 'whisky',
     title: 'Виски',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Блэк рам', portion: '40 мл', price: 280 },
       { name: 'Джим Бим', portion: '40 мл', price: 420 },
@@ -723,7 +701,6 @@ export const menu: MenuCategory[] = [
     id: 'cognac',
     title: 'Коньяк и бренди',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Арарат 3 года', portion: '40 мл', price: 290 },
       { name: 'Арарат 5 лет', portion: '40 мл', price: 390 },
@@ -739,7 +716,6 @@ export const menu: MenuCategory[] = [
     id: 'armagnac',
     title: 'Арманьяк и кальвадос',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Жано В.С.О.П.', portion: '40 мл', price: 570 },
       { name: 'Пер Маглауар', portion: '40 мл', price: 450 },
@@ -749,7 +725,6 @@ export const menu: MenuCategory[] = [
     id: 'rum',
     title: 'Ром',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Такамака Бланко', portion: '40 мл', price: 410 },
       { name: 'Бругал Аньехо', portion: '40 мл', price: 470 },
@@ -761,7 +736,6 @@ export const menu: MenuCategory[] = [
     id: 'gin',
     title: 'Джин',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Хопперс', portion: '40 мл', price: 260, description: 'в ассортименте' },
       { name: 'Бифитер', portion: '40 мл', price: 430 },
@@ -772,7 +746,6 @@ export const menu: MenuCategory[] = [
     id: 'tequila',
     title: 'Текила',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Ольмека Бланко', portion: '40 мл', price: 420 },
       { name: 'Ольмека Золотая', portion: '40 мл', price: 430 },
@@ -783,7 +756,6 @@ export const menu: MenuCategory[] = [
     id: 'vodka',
     title: 'Водка',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Царская оригинальная', portion: '40 мл', price: 190 },
       { name: 'Ортодокс', portion: '40 мл', price: 210 },
@@ -800,7 +772,6 @@ export const menu: MenuCategory[] = [
     id: 'liqueurs',
     title: 'Ликеры и вермуты',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Мартини', portion: '40 мл', price: 390, description: 'в ассортименте' },
       { name: 'Белуга', portion: '40 мл', price: 400, description: 'в ассортименте' },
@@ -814,7 +785,6 @@ export const menu: MenuCategory[] = [
     id: 'port',
     title: 'Портвейн и херес',
     group: 'bar',
-    layout: 'list',
     items: [
       { name: 'Копке Файн Руби Порто', portion: '40 мл', price: 390 },
       { name: 'Копке Файн Уайт Порто', portion: '40 мл', price: 390 },
@@ -825,7 +795,6 @@ export const menu: MenuCategory[] = [
     id: 'white',
     title: 'Белые вина',
     group: 'wine',
-    layout: 'list',
     items: [
       {
         name: 'Фрескелло Семи Свит Уайт',
@@ -895,7 +864,6 @@ export const menu: MenuCategory[] = [
     id: 'red',
     title: 'Красные вина',
     group: 'wine',
-    layout: 'list',
     items: [
       {
         name: 'Фрескелло Семи Свит Ред',
@@ -965,7 +933,6 @@ export const menu: MenuCategory[] = [
     id: 'rose',
     title: 'Розовые вина',
     group: 'wine',
-    layout: 'list',
     items: [
       {
         name: 'Павао Винью Верде Розе',
@@ -983,7 +950,6 @@ export const menu: MenuCategory[] = [
     id: 'sparkling',
     title: 'Игристые вина и шампанское',
     group: 'wine',
-    layout: 'list',
     items: [
       { name: 'Игристое по бокалам', price: 270 },
       {
@@ -1040,7 +1006,6 @@ export const menu: MenuCategory[] = [
     id: 'nonalc',
     title: 'Безалкогольные вина',
     group: 'wine',
-    layout: 'list',
     items: [
       {
         name: 'Винья Албали Совиньон Блан',

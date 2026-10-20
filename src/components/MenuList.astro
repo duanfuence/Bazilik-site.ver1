@@ -61,9 +61,14 @@ const { items } = Astro.props;
   }
   .mlist__head {
     display: flex;
-    flex-wrap: wrap; /* при крупном шрифте цена уходит на следующую строку */
     align-items: baseline;
     gap: 0.25rem 0.75rem;
+  }
+  /* Очень узко в пересчёте на шрифт (крупный шрифт в браузере на телефоне): цена уходит под название */
+  @media (max-width: 20em) {
+    .mlist__head {
+      flex-wrap: wrap;
+    }
   }
   .mlist__name {
     font-family: var(--font-display);

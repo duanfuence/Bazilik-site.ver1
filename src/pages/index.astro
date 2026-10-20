@@ -5,14 +5,14 @@ import OpenStatus from '../components/OpenStatus.astro';
 import MenuStrip from '../components/MenuStrip.astro';
 import HoursTable from '../components/HoursTable.astro';
 import { routeLinks, site } from '../config/site';
-import { menu } from '../data/menu';
+import { homePreviewIds, menu } from '../data/menu';
 import { chef } from '../data/chef';
 import { occasions } from '../data/events';
 import { restaurantSchema } from '../lib/schema';
 
-// Превью меню: по две позиции из каждого «фотогеничного» раздела
+// Превью меню: по две позиции из избранных разделов
 const preview = menu
-  .filter((c) => c.layout === 'gallery')
+  .filter((c) => homePreviewIds.includes(c.id))
   .flatMap((c) => c.items.slice(0, 2).map((item) => ({ ...item, kicker: c.title })));
 
 const origin = Astro.site ?? new URL(Astro.url.origin);
