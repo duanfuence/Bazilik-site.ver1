@@ -3,43 +3,42 @@ import Base from '../layouts/Base.astro';
 import PageIntro from '../components/PageIntro.astro';
 import MenuStrip from '../components/MenuStrip.astro';
 import MenuList from '../components/MenuList.astro';
-import { menu, menuIsDemo } from '../data/menu';
-import { site } from '../config/site';
+import { allergyNote, menu, menuGroups } from '../data/menu';
+
+// Сквозная нумерация разделов по всей странице
+const num = (id: string) => String(menu.findIndex((c) => c.id === id) + 1).padStart(2, '0');
+const groups = menuGroups
+  .map((g) => ({ ...g, categories: menu.filter((c) => c.group === g.id) }))
+  .filter((g) => g.categories.length > 0);
 ---
 
 <Base
   title="Меню"
-  description="Меню ресторана «Базилик» в Тамбове: закуски, салаты, супы, горячее, десерты от шефа-кондитера и напитки. Цены и выход блюд."
+  description="Меню ресторана «Базилик» в Тамбове с ценами: стартеры, салаты, паста, супы, блюда из рыбы и мяса, гриль, десерты, напитки, бар и винная карта."
 >
   <PageIntro label="Меню">
     <Fragment slot="title">Меню <span class="accent">ресторана</span></Fragment>
-    <p>Разделы с фотографиями листаются вправо — пальцем, кнопками или стрелками на клавиатуре. Состав, аллергены и замену ингредиентов уточнит официант.</p>
+    <p>Разделы с фотографиями листаются вправо — пальцем, кнопками или стрелками на клавиатуре.</p>
+    <p class="menu-allergy">{allergyNote}</p>
   </PageIntro>
-
-  {
-    menuIsDemo && (
-      <div class="wrap">
-        <p class="notice notice--info demo-banner" role="note">
-          <strong>Меню на сайте наполняется.</strong>
-          <span>
-            Сейчас здесь демонстрационные позиции без цен — они помечены «демо». Актуальное меню и цены — по телефону{' '}
-            <a href={`tel:${site.phone.tel}`}>{site.phone.local}</a>.
-          </span>
-        </p>
-      </div>
-    )
-  }
 
   <nav class="catnav" aria-label="Разделы меню" data-catnav>
     <div class="wrap">
       <ul class="catnav__list">
         {
-          menu.map((c, i) => (
-            <li>
-              <a href={`#${c.id}`} data-cat-link={c.id}>
-                <span class="catnav__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                {c.title}
-              </a>
+          groups.map((g) => (
+            <li class="catnav__group">
+              <span class="catnav__glabel">{g.title}</span>
+              <ul aria-label={g.title}>
+                {g.categories.map((c) => (
+                  <li>
+                    <a href={`#${c.id}`} data-cat-link={c.id}>
+                      <span class="catnav__num" aria-hidden="true">{num(c.id)}</span>
+                      {c.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))
         }
@@ -48,20 +47,33 @@ import { site } from '../config/site';
   </nav>
 
   {
-    menu.map((c, i) => (
-      <section class:list={['cat', `cat--${c.layout}`]} id={c.id} aria-labelledby={`${c.id}-title`} data-cat>
-        <div class="wrap cat__head">
-          <p class="cat__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
-          <h2 id={`${c.id}-title`} class="h2 cat__title">{c.title}</h2>
-          {c.note && <p class="cat__note accent">{c.note}</p>}
+    groups.map((g) => (
+      <section class="mgroup" id={`razdel-${g.id}`} aria-labelledby={`razdel-${g.id}-title`}>
+        <div class="wrap mgroup__head">
+          <h2 id={`razdel-${g.id}-title`} class="h-display">{g.title}</h2>
+          {g.note && <p class="mgroup__note muted">{g.note}</p>}
         </div>
-        {c.layout === 'gallery' ? (
-          <MenuStrip id={c.id} label={c.title} items={c.items} />
-        ) : (
-          <div class="wrap">
-            <MenuList items={c.items} />
-          </div>
-        )}
+        {g.categories.map((c) => (
+          <section class:list={['cat', `cat--${c.layout}`]} id={c.id} aria-labelledby={`${c.id}-title`} data-cat>
+            <div class="wrap cat__head">
+              <p class="cat__num" aria-hidden="true">{num(c.id)}</p>
+              <h3 id={`${c.id}-title`} class="h2 cat__title">{c.title}</h3>
+              {c.note && <p class="cat__note">{c.note}</p>}
+            </div>
+            {c.layout === 'gallery' ? (
+              <MenuStrip id={c.id} label={c.title} items={c.items} itemHeading="h4" />
+            ) : (
+              <div class="wrap">
+                <MenuList items={c.items} />
+              </div>
+            )}
+            {c.footnotes && (
+              <div class="wrap cat__foot">
+                {c.footnotes.map((f) => <p>{f}</p>)}
+              </div>
+            )}
+          </section>
+        ))}
       </section>
     ))
   }
@@ -73,13 +85,9 @@ import { site } from '../config/site';
 </Base>
 
 <style>
-  .demo-banner {
-    max-width: 52rem;
-    margin-bottom: var(--space-4);
-  }
-  .demo-banner a {
-    white-space: nowrap;
-    font-weight: 500;
+  .menu-allergy {
+    font-size: var(--fs-body);
+    color: var(--ink-2);
   }
 
   /* Липкая навигация по разделам: на телефоне листается по горизонтали */
@@ -104,6 +112,33 @@ import { site } from '../config/site';
   }
   .catnav__list::-webkit-scrollbar {
     display: none;
+  }
+  /* Группа: подпись «Кухня», «Бар»… и её разделы */
+  .catnav__group {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: none;
+  }
+  .catnav__group + .catnav__group {
+    margin-left: 0.75rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--line-strong);
+  }
+  .catnav__glabel {
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-right: 0.25rem;
+    white-space: nowrap;
+  }
+  .catnav__group ul {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
   }
   .catnav a {
     display: inline-flex;
@@ -134,6 +169,24 @@ import { site } from '../config/site';
     opacity: 0.7;
   }
 
+  /* Группа меню: «Кухня», «Напитки», «Бар», «Вина» */
+  .mgroup {
+    padding-top: var(--space-5);
+  }
+  .mgroup + .mgroup {
+    margin-top: var(--space-5);
+  }
+  .mgroup__head {
+    display: grid;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line-strong);
+    scroll-margin-top: calc(var(--header-h) + 3.75rem);
+  }
+  .mgroup__note {
+    font-size: var(--fs-small);
+  }
+
   .cat {
     padding-top: var(--space-5);
     scroll-margin-top: calc(var(--header-h) + 3.75rem);
@@ -153,8 +206,17 @@ import { site } from '../config/site';
   }
   .cat__note {
     grid-column: 2;
-    font-family: var(--font-display);
-    font-size: 1.25rem;
+    margin-top: 0.4rem;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .cat__foot {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 1rem;
+    font-size: var(--fs-small);
+    font-style: italic;
+    color: var(--ink-2);
   }
   .cat--gallery .cat__head {
     margin-bottom: 1rem;
@@ -185,7 +247,10 @@ import { site } from '../config/site';
     links.forEach((a, key) => {
       if (key === id) {
         a.setAttribute('aria-current', 'true');
-        if (list) list.scrollTo({ left: a.offsetLeft - 16, behavior: 'smooth' });
+        if (list) {
+          const left = a.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft - 16;
+          list.scrollTo({ left, behavior: 'smooth' });
+        }
       } else a.removeAttribute('aria-current');
     });
   };

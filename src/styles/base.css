@@ -345,8 +345,8 @@ p {
   }
 }
 
-/* Пометка временного контента */
-.demo-tag {
+/* Короткая пометка рядом с названием («новинка») */
+.tag {
   display: inline-block;
   padding: 0.05rem 0.4rem;
   border: 1px solid var(--tomato);
@@ -356,7 +356,7 @@ p {
   letter-spacing: 0.1em;
   line-height: 1.4;
 }
-.on-dark .demo-tag {
+.on-dark .tag {
   border-color: var(--sage);
   color: var(--sage);
 }

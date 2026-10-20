@@ -84,7 +84,7 @@ export const site = {
   social: [
     { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/bazilikrest/' },
     { id: 'telegram', label: 'Telegram', href: 'https://t.me/bazilikrest' },
-    { id: 'vk', label: 'ВКонтакте', href: 'https://vk.ru/bazilikrest' },
+    { id: 'vk', label: 'ВКонтакте', href: 'https://vk.com/bazilikrest' },
   ] as SocialLink[],
 
   /**

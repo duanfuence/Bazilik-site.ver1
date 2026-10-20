@@ -5,15 +5,19 @@
  * Прокручивается только лента — страница в ширину не «едет».
  */
 import Photo from './Photo.astro';
-import { formatPrice, type MenuItem } from '../data/menu';
+import { priceLabel, type MenuItem } from '../data/menu';
+import type { Tone } from '../data/photos';
 
 interface Props {
   id: string;
   label: string;
   items: (MenuItem & { kicker?: string })[];
+  /** Уровень заголовка позиции: h3 на главной, h4 внутри раздела меню */
+  itemHeading?: 'h3' | 'h4';
 }
 
-const { id, label, items } = Astro.props;
+const { id, label, items, itemHeading = 'h3' } = Astro.props;
+const ItemHeading = itemHeading;
 
 // Ритм коллажа повторяется каждые 5 кадров: высокий, малый ниже, широкий, узкий, квадрат.
 const variants = [
@@ -24,6 +28,8 @@ const variants = [
   { v: 'e', ratio: '1/1' },
 ];
 const trackId = `strip-${id}`;
+// Тон заглушки чередуется, пока у блюда нет фотографии
+const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
 ---
 
 <div class="strip" data-strip>
@@ -48,18 +54,18 @@ const trackId = `strip-${id}`;
           <li class={`strip__item strip__item--${v}`}>
             <article>
               <Photo
-                photo={{ src: item.photo, alt: item.name, brief: `Фото: ${item.name.toLowerCase()}`, ratio, tone: item.tone ?? 'clay' }}
+                photo={{ src: item.photo, alt: item.name, brief: `Фото: ${item.name.toLowerCase()}`, ratio, tone: tones[i % tones.length] }}
                 sizes="(min-width: 1024px) 30vw, 75vw"
               />
               <div class="strip__meta">
                 <p class="strip__num label muted">
                   {item.kicker ?? String(i + 1).padStart(2, '0')}
-                  {item.demo && <span class="demo-tag">демо</span>}
+                  {item.isNew && <span class="tag">новинка</span>}
                 </p>
-                <h3 class="strip__name">{item.name}</h3>
+                <ItemHeading class="strip__name">{item.name}</ItemHeading>
                 {item.description && <p class="strip__desc">{item.description}</p>}
                 <p class="strip__price">
-                  <span>{formatPrice(item.price)}</span>
+                  <span>{priceLabel(item)}</span>
                   {item.portion && <span class="muted">{item.portion}</span>}
                 </p>
               </div>

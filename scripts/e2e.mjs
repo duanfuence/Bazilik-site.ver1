@@ -195,9 +195,9 @@ ok('мобильная навигация: открывается, закрыв�
 // Лента меню: кнопки листают ленту, страница не едет вбок
 await page.setViewportSize({ width: 1440, height: 900 });
 await page.goto(base + '/menu');
-const track = page.locator('#strip-goryachee');
+const track = page.locator('#strip-meat');
 const start = await track.evaluate((el) => el.scrollLeft);
-await page.click('[aria-controls="strip-goryachee"][data-strip-next]');
+await page.click('[aria-controls="strip-meat"][data-strip-next]');
 await page.waitForTimeout(700);
 const moved = await track.evaluate((el) => el.scrollLeft);
 assert.ok(moved > start, 'лента прокрутилась');
@@ -209,9 +209,9 @@ assert.ok((await track.evaluate((el) => el.scrollLeft)) > moved, 'стрелка
 ok('лента меню: листается кнопками и клавишей →, страница не прокручивается по горизонтали');
 
 // Навигация по категориям
-await page.click('[data-cat-link="deserty"]');
+await page.click('[data-cat-link="desserts"]');
 await page.waitForTimeout(1200);
-assert.equal(await page.getAttribute('[data-cat-link="deserty"]', 'aria-current'), 'true');
+assert.equal(await page.getAttribute('[data-cat-link="desserts"]', 'aria-current'), 'true');
 ok('навигация по разделам меню: переход и подсветка текущего раздела');
 
 assert.deepEqual(consoleErrors, []);

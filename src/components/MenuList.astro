@@ -1,5 +1,8 @@
 ---
-/** Типографский список позиций: название — отточие — цена, ниже описание и выход. */
+/**
+ * Типографский список позиций: название — отточие — цена, ниже состав и выход.
+ * У напитков с несколькими объёмами справа столбик «объём — цена».
+ */
 import { formatPrice, type MenuItem } from '../data/menu';
 
 interface Props {
@@ -13,19 +16,28 @@ const { items } = Astro.props;
     items.map((item) => (
       <li class="mlist__item">
         <div class="mlist__head">
-          <h3 class="mlist__name">
+          <h4 class="mlist__name">
             {item.name}
-            {item.demo && <span class="demo-tag">демо</span>}
-          </h3>
+            {item.isNew && <span class="tag">новинка</span>}
+          </h4>
           <span class="mlist__dots" aria-hidden="true" />
-          <span class="mlist__price">{formatPrice(item.price)}</span>
+          {item.prices?.length ? (
+            <dl class="mlist__prices">
+              {item.prices.map((p) => (
+                <div>
+                  <dt>{p.volume}</dt>
+                  <dd>{formatPrice(p.price)}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <span class="mlist__price">
+              {item.portion && <span class="mlist__portion">{item.portion}</span>}
+              {formatPrice(item.price)}
+            </span>
+          )}
         </div>
-        {(item.description || item.portion) && (
-          <p class="mlist__desc">
-            {item.description}
-            {item.portion && <span class="mlist__portion"> · {item.portion}</span>}
-          </p>
-        )}
+        {item.description && <p class="mlist__desc">{item.description}</p>}
       </li>
     ))
   }
@@ -44,7 +56,7 @@ const { items } = Astro.props;
     }
   }
   .mlist__item {
-    padding-block: 1.25rem;
+    padding-block: 1.1rem;
     border-bottom: 1px solid var(--line);
   }
   .mlist__head {
@@ -53,12 +65,15 @@ const { items } = Astro.props;
     gap: 0.75rem;
   }
   .mlist__name {
-    font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.6rem);
-    line-height: 1.15;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.2rem, 1.1rem + 0.45vw, 1.5rem);
+    line-height: 1.2;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 0.6rem;
+    min-width: 0;
   }
   .mlist__dots {
     flex: 1;
@@ -68,18 +83,46 @@ const { items } = Astro.props;
   }
   .mlist__price {
     flex: none;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
     font-variant-numeric: tabular-nums;
     font-weight: 500;
     font-size: 0.95rem;
     white-space: nowrap;
   }
+  .mlist__portion {
+    font-weight: 400;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+  }
+  /* Несколько объёмов: «150 мл — 490 ₽», «750 мл — 2 450 ₽» */
+  .mlist__prices {
+    flex: none;
+    display: grid;
+    gap: 0.15rem;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+  }
+  .mlist__prices div {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .mlist__prices dt {
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+  }
+  .mlist__prices dd {
+    margin: 0;
+    font-weight: 500;
+    white-space: nowrap;
+  }
   .mlist__desc {
     margin-top: 0.4rem;
-    max-width: 34rem;
+    max-width: 36rem;
     font-size: 0.9rem;
     color: var(--ink-2);
-  }
-  .mlist__portion {
-    color: var(--ink-3);
   }
 </style>
