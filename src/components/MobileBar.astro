@@ -44,9 +44,10 @@ const { hideBooking = false } = Astro.props;
     align-items: center;
     justify-content: center;
     gap: 0.15rem;
-    min-width: 4.25rem;
+    min-width: min(4.25rem, 18vw);
     min-height: 3.25rem;
     font-size: 0.75rem;
+    text-align: center;
     text-decoration: none;
   }
   .mbar__item svg {
@@ -55,6 +56,8 @@ const { hideBooking = false } = Astro.props;
   }
   .mbar__item--primary {
     flex: 1;
+    min-width: 0;
+    padding-inline: 0.5rem;
     flex-direction: row;
     border-radius: var(--radius);
     background: var(--tomato);
@@ -65,7 +68,7 @@ const { hideBooking = false } = Astro.props;
   .mbar__item--primary:active {
     background: var(--tomato-press);
   }
-  @media (min-width: 720px) {
+  @media (min-width: 45em) {
     .mbar {
       display: none;
     }

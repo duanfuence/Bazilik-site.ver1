@@ -49,6 +49,16 @@ for (const width of widths) {
         if (r.width && (r.right > docW + 1 || r.left < -1)) {
           // элементы внутри горизонтальных лент прокручиваются намеренно
           if (el.closest('[data-strip-track], .catnav__list, dialog:not([open]), .hp, .skip-link, .visually-hidden')) continue;
+          // элемент внутри обрезающего контейнера (overflow: clip/hidden) за его границы не выходит
+          let clipped = false;
+          for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+            const ox = getComputedStyle(a).overflowX;
+            if (ox === 'clip' || ox === 'hidden') {
+              const ar = a.getBoundingClientRect();
+              if (ar.right <= docW + 1 && ar.left >= -1) { clipped = true; break; }
+            }
+          }
+          if (clipped) continue;
           offenders.push(`${el.tagName.toLowerCase()}.${[...el.classList].join('.')} → ${Math.round(r.left)}..${Math.round(r.right)}`);
         }
       }

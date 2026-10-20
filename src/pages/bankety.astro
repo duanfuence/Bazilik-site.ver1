@@ -138,7 +138,7 @@ import { banquetFacts, banquetSteps, occasions } from '../data/events';
   }
   .occ__item {
     display: grid;
-    grid-template-columns: 2.5rem 1fr;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
     gap: 0.1rem 1rem;
     align-items: baseline;
     padding-block: 1rem;
@@ -169,7 +169,7 @@ import { banquetFacts, banquetSteps, occasions } from '../data/events';
   }
   @media (min-width: 900px) {
     .occ__item {
-      grid-template-columns: 3rem auto 1fr;
+      grid-template-columns: 3rem minmax(0, auto) minmax(0, 1fr);
     }
     .occ__num {
       grid-row: auto;

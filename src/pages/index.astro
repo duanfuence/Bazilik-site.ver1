@@ -25,7 +25,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   jsonLd={restaurantSchema(origin)}
 >
   <!-- Обложка -->
-  <section class="cover" aria-labelledby="cover-title">
+  <section class="cover scene" aria-labelledby="cover-title">
     <div class="wrap">
       <div class="cover__meta label">
         <span>Ресторан · {site.city}</span>
@@ -77,7 +77,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   </section>
 
   <!-- 01 Меню -->
-  <section class="section menu-teaser" aria-labelledby="menu-title">
+  <section class="section menu-teaser scene" aria-labelledby="menu-title">
     <div class="wrap grid">
       <p class="index label teaser-index"><span class="index__num">01</span> Меню</p>
       <h2 id="menu-title" class="h-display teaser-title" data-reveal>
@@ -87,14 +87,14 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
         <p>Закуски, горячее и десерты от шефа-кондитера. Листайте ленту — или откройте полное меню с ценами и выходом блюд.</p>
         <a class="arrow-link" href="/menu">Открыть меню</a>
       </div>
-    </div>
-    <div class="teaser-strip">
-      <MenuStrip id="home" label="Избранное из меню" items={preview} />
+      <div class="teaser-strip">
+        <MenuStrip id="home" label="Избранное из меню" items={preview} fit />
+      </div>
     </div>
   </section>
 
   <!-- 02 Шеф -->
-  <section class="section on-dark chef" aria-labelledby="chef-title">
+  <section class="section on-dark chef scene scene--stage" aria-labelledby="chef-title">
     <div class="wrap grid">
       <div class="chef__photo" data-reveal>
         <Photo name="chefPortrait" sizes="(min-width: 1024px) 40vw, 100vw" />
@@ -123,7 +123,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   </section>
 
   <!-- 03 Пространство -->
-  <section class="section space" aria-labelledby="space-title">
+  <section class="section space scene" aria-labelledby="space-title">
     <div class="wrap grid space__grid">
       <p class="index label space__index"><span class="index__num">03</span> Пространство</p>
       <Photo name="interiorWide" class="space__wide" sizes="(min-width: 1024px) 62vw, 100vw" caption="Общий план зала" />
@@ -141,7 +141,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   </section>
 
   <!-- 04 Банкеты -->
-  <section class="section on-tomato banquet" aria-labelledby="banquet-title">
+  <section class="section on-tomato banquet scene scene--stage" aria-labelledby="banquet-title">
     <div class="wrap grid">
       <p class="index label banquet__index"><span class="index__num">04</span> Банкеты и события</p>
       <h2 id="banquet-title" class="h-display banquet__title" data-reveal>
@@ -197,19 +197,40 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
 </Base>
 
 <style>
-  /* ---------- Обложка ---------- */
-  /*
-   * Первый экран рассчитан от высоты окна, а не только от ширины:
-   * главное фото сохраняет пропорции 4:5 и целиком, с подписью, помещается под шапкой.
-   * --fold — видимая высота под шапкой; на телефоне учитываем ещё нижнюю панель действий.
+  /* ---------- Сцены главной ----------
+   * Первые блоки главной — «сцены»: на компьютере каждая занимает экран под шапкой,
+   * а размеры фото и заголовков считаются от доступной высоты (--fold), а не только от ширины.
+   * min-height, а не height: при крупном шрифте или узком окне сцена просто становится выше.
+   * Прокрутка остаётся обычной — никакого примагничивания и перехвата колёсика.
    */
-  .cover {
+  .scene {
     --fold: calc(100vh - var(--header-h));
-    padding-block: 1.25rem var(--space-5);
+    --scene-pad: clamp(1.5rem, 5vh, 4rem);
   }
   @supports (height: 100svh) {
-    .cover {
+    .scene {
       --fold: calc(100svh - var(--header-h));
+      --scene-pad: clamp(1.5rem, 5svh, 4rem);
+    }
+  }
+  @media (min-width: 900px) and (min-height: 560px) {
+    .scene {
+      min-height: var(--fold);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-block: var(--scene-pad);
+    }
+  }
+
+  /* ---------- Обложка ---------- */
+  .cover {
+    padding-block: 1.25rem var(--space-5);
+  }
+  @media (min-width: 900px) and (min-height: 560px) {
+    .cover {
+      justify-content: flex-start;
+      padding-block: 1.25rem clamp(1rem, 3svh, 2rem);
     }
   }
   .cover__meta {
@@ -233,12 +254,20 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
     z-index: 2;
     display: grid;
     line-height: 1;
+    /* размер названия ограничен шириной своей колонки — оно не заходит на фото */
+    container-type: inline-size;
   }
   .cover__word {
     display: block;
     margin-left: -0.04em;
-    /* на невысоких экранах название не съедает место у фотографий */
-    font-size: min(var(--fs-mega), 26svh);
+    /* «Базилик» в Bona Nova ≈ 3,45 em шириной: 28cqi держит слово в колонке;
+       26svh — на невысоких экранах название не съедает место у фотографий */
+    font-size: min(var(--fs-mega), 26vh, 28cqi);
+  }
+  @supports (height: 100svh) {
+    .cover__word {
+      font-size: min(var(--fs-mega), 26svh, 28cqi);
+    }
   }
   .cover__hall {
     grid-column: 3 / -1;
@@ -278,7 +307,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
       grid-template-rows: auto auto 1fr;
     }
     .cover__title {
-      grid-column: 1 / 12;
+      grid-column: 1 / 8;
       grid-row: 1;
       align-self: start;
     }
@@ -344,6 +373,10 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   /* ---------- Меню ---------- */
   .menu-teaser {
     padding-bottom: var(--space-5);
+    /* высота самого высокого кадра ленты: экран минус отступы сцены, кнопки ленты и подписи к блюдам */
+    --strip-h: clamp(12rem, calc(var(--fold) - 2 * var(--scene-pad) - 24.5rem), 30rem);
+    /* насколько ленте выйти за поля, чтобы дойти до края окна */
+    --bleed: calc(var(--gutter) + max(0px, (100vw - var(--max)) / 2));
   }
   .teaser-index {
     grid-column: 1 / -1;
@@ -370,7 +403,55 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
     }
   }
   .teaser-strip {
+    grid-column: 1 / -1;
     margin-top: var(--space-4);
+    margin-inline: calc(-1 * var(--bleed));
+    min-width: 0;
+  }
+  /*
+   * Сцена «разворот»: заголовок и текст слева, лента справа уходит за край окна.
+   * Так карточки получают ширину для подписей, а кадры — высоту экрана.
+   */
+  @media (min-width: 900px) and (min-height: 560px) {
+    .menu-teaser {
+      padding-bottom: var(--scene-pad);
+    }
+    .menu-teaser .grid {
+      align-items: center;
+    }
+    .teaser-title {
+      grid-column: 1 / 5;
+      grid-row: 2;
+      align-self: end;
+      margin-top: clamp(1rem, 4svh, 3rem);
+      font-size: min(var(--fs-display), 11svh, 6.4vw);
+    }
+    .teaser-text {
+      grid-column: 1 / 5;
+      grid-row: 3;
+      align-self: start;
+      margin-top: clamp(0.75rem, 2.5svh, 1.5rem);
+    }
+    .teaser-strip {
+      grid-column: 5 / -1;
+      grid-row: 2 / 4;
+      margin-top: clamp(1rem, 4svh, 3rem);
+      margin-inline: 0 calc(-1 * var(--bleed));
+      /* лента начинается от колонки, справа оставляем поле до края окна */
+      --strip-inset-start: 0px;
+      --strip-inset-end: var(--gutter);
+    }
+    .teaser-strip :global(.strip__bar) {
+      max-width: none;
+      margin: 0;
+      padding-inline: 0 var(--gutter);
+    }
+  }
+  /* На невысоких экранах лента компактнее: состав блюд скрывает сама лента (см. MenuStrip, режим fit) */
+  @media (min-width: 900px) and (min-height: 560px) and (max-height: 820px) {
+    .menu-teaser {
+      --strip-h: clamp(11rem, calc(var(--fold) - 2 * var(--scene-pad) - 22rem), 30rem);
+    }
   }
 
   /* ---------- Шеф ---------- */
@@ -406,7 +487,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   }
   .ledger__row {
     display: grid;
-    grid-template-columns: minmax(5.5rem, auto) 1fr;
+    grid-template-columns: minmax(5.5rem, auto) minmax(0, 1fr);
     gap: 1.25rem;
     align-items: baseline;
     padding-block: 1rem;
@@ -429,8 +510,55 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
   .chef__exp {
     font-size: var(--fs-small);
   }
+  @media (min-width: 900px) and (min-height: 560px) {
+    .chef .grid {
+      align-items: center;
+    }
+    /* портрет 4:5 по высоте экрана */
+    .chef__photo {
+      width: min(100%, calc((var(--fold) - 2 * var(--scene-pad)) * 0.8));
+    }
+    .chef__body {
+      gap: clamp(0.5rem, 1.8svh, 1.5rem);
+    }
+    .chef__name {
+      margin-top: 0;
+      font-size: min(var(--fs-display), 9svh);
+    }
+    .chef__body .lead {
+      font-size: min(var(--fs-lead), max(1rem, 2.6svh));
+    }
+    .ledger {
+      margin-top: 0;
+    }
+    .ledger__row {
+      padding-block: clamp(0.4rem, 1.4svh, 1rem);
+    }
+    .ledger__mark {
+      font-size: min(clamp(2.4rem, 1.8rem + 2.4vw, 4rem), 6svh);
+    }
+    .ledger__text {
+      font-size: min(var(--fs-lead), max(1rem, 2.4svh));
+    }
+  }
+  /* Узкое окно компьютера: тексту шефа — на колонку больше, чтобы строки не дробились */
+  @media (min-width: 900px) and (max-width: 1199px) and (min-height: 560px) {
+    .chef__photo {
+      grid-column: 1 / 6;
+    }
+    .chef__body {
+      grid-column: 6 / -1;
+    }
+    .chef__exp {
+      display: none;
+    }
+  }
 
   /* ---------- Пространство ---------- */
+  .space {
+    /* высота общего плана зала: экран минус подпись, текст и отступы */
+    --space-h: clamp(12rem, calc(var(--fold) - 31rem), 34rem);
+  }
   .space__grid {
     row-gap: 2rem;
   }
@@ -454,25 +582,48 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
     display: none;
   }
   @media (min-width: 900px) {
+    .space__grid {
+      row-gap: clamp(1rem, 2.5svh, 2rem);
+    }
     .space__wide {
       grid-column: 1 / 9;
       grid-row: 2;
+      width: min(100%, calc(var(--space-h) * 16 / 9));
     }
     .space__table {
       grid-column: 10 / -1;
       grid-row: 2 / 4;
-      margin-top: 40%;
+      justify-self: end;
+      width: min(100%, calc(var(--space-h) * 0.8));
+      margin-top: calc(var(--space-h) * 0.3);
     }
     .space__text {
-      grid-column: 2 / 7;
+      grid-column: 1 / 6;
       grid-row: 3;
-      margin-top: 1rem;
     }
     .space__detail {
       display: block;
-      grid-column: 7 / 9;
+      grid-column: 6 / 9;
       grid-row: 3;
-      margin-top: -3rem;
+      justify-self: end;
+      align-self: start;
+      width: min(100%, 11rem);
+    }
+  }
+  @media (min-width: 900px) and (min-height: 560px) {
+    .space__text .h2 {
+      font-size: min(var(--fs-h2), 7svh);
+    }
+    /* Общий план — во всю ширину колонок, высота от экрана: кадр становится панорамным, а не мельчает */
+    .space__wide {
+      width: 100%;
+      container-type: inline-size;
+    }
+    .space__wide :global(.photo__ph),
+    .space__wide :global(img) {
+      aspect-ratio: auto;
+      /* не выше 3:4 от ширины — на узких окнах кадр не превращается в квадрат */
+      height: min(var(--space-h), 75cqi);
     }
   }
 
@@ -524,6 +675,138 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
       align-self: end;
     }
   }
+  @media (min-width: 900px) and (min-height: 560px) {
+    .banquet .grid {
+      row-gap: clamp(1rem, 3svh, 2rem);
+    }
+    .banquet__title {
+      font-size: min(var(--fs-display), 13svh);
+    }
+    .banquet__list {
+      font-size: min(clamp(1.5rem, 1.1rem + 1.6vw, 2.6rem), 5svh);
+    }
+  }
+
+  /* ---------- Переходы между сценами ----------
+   * Анимации привязаны к положению прокрутки (scroll-driven animations): браузер считает их сам,
+   * без обработчиков прокрутки, и они не могут «держать» страницу — прокрутка всегда обычная.
+   * Свойства анимации заданы по отдельности: минификатор склеивает сокращённое «animation»
+   * с animation-timeline в запись, которую браузеры не принимают.
+   * Только transform, opacity и clip-path. Где технология не поддерживается или включено
+   * «уменьшение движения», всё просто стоит на местах; текст появляется через data-reveal.
+   */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Вступление мягко отдаляется, когда его прокручивают */
+      .cover__grid {
+        animation-name: cover-out;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 90%;
+      }
+
+      /* Тёмная и томатная сцены «раздвигаются»: фон вырастает до полной ширины при входе */
+      .scene--stage {
+        position: relative;
+        isolation: isolate;
+        background-color: transparent;
+      }
+      .scene--stage::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: var(--stage-bg);
+        transform-origin: 50% 100%;
+        animation-name: stage-open;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 70%;
+      }
+      .chef {
+        --stage-bg: var(--olive);
+      }
+      .banquet {
+        --stage-bg: var(--tomato);
+      }
+
+      /* Фотографии сцен открываются из-под маски, кадр внутри слегка «оседает» */
+      .chef__photo :global(.photo),
+      .space__grid > :global(.photo) {
+        view-timeline: --shot block;
+        /* увеличенный в начале кадр не должен расширять страницу */
+        overflow: clip;
+        animation-name: shot-mask;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --shot;
+        animation-range: entry 5% cover 45%;
+      }
+      .chef__photo :global(.photo__ph),
+      .space__grid > :global(.photo) :global(.photo__ph),
+      .chef__photo :global(img),
+      .space__grid > :global(.photo) :global(img) {
+        animation-name: shot-settle;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --shot;
+        animation-range: entry 5% cover 50%;
+      }
+
+      /* Лента «Кухня в деталях» раскрывается веером: дальние кадры приходят издалека */
+      .menu-teaser {
+        view-timeline: --teaser block;
+      }
+      .teaser-strip :global(.strip__item) {
+        animation-name: strip-in;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --teaser;
+        animation-range: entry 15% cover 45%;
+      }
+      .teaser-strip :global(.strip__item:nth-child(2)) {
+        --from: 10vw;
+      }
+      .teaser-strip :global(.strip__item:nth-child(3)) {
+        --from: 16vw;
+      }
+      .teaser-strip :global(.strip__item:nth-child(n + 4)) {
+        --from: 22vw;
+      }
+    }
+  }
+  @keyframes cover-out {
+    to {
+      opacity: 0.35;
+      transform: scale(0.97);
+    }
+  }
+  @keyframes stage-open {
+    from {
+      transform: scale(0.94, 0.96);
+    }
+  }
+  @keyframes shot-mask {
+    from {
+      clip-path: inset(14% 10% 14% 10%);
+    }
+    to {
+      clip-path: inset(0);
+    }
+  }
+  @keyframes shot-settle {
+    from {
+      transform: scale(1.12);
+    }
+  }
+  @keyframes strip-in {
+    from {
+      opacity: 0;
+      transform: translateX(var(--from, 6vw));
+    }
+  }
 
   /* ---------- Как нас найти ---------- */
   .find .grid {
@@ -559,7 +842,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
     justify-self: start;
     margin-top: 1rem;
   }
-  @media (min-width: 768px) {
+  @media (min-width: 48em) {
     .find__col--a {
       grid-column: 1 / 7;
     }
@@ -570,7 +853,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
       grid-column: 1 / 7;
     }
   }
-  @media (min-width: 1100px) {
+  @media (min-width: 68.75em) {
     .find__col--a {
       grid-column: 1 / 5;
     }

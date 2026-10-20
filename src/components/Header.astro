@@ -179,17 +179,18 @@ const groups = hoursGroups();
     width: 1.1rem;
   }
 
-  @media (min-width: 720px) {
+  /* Точки перелома в em: при крупном шрифте в браузере шапка раньше переходит на компактный вид */
+  @media (min-width: 45em) {
     .header__book {
       display: inline-flex;
     }
   }
-  @media (min-width: 900px) {
+  @media (min-width: 56.25em) {
     .header__phone {
       display: inline;
     }
   }
-  @media (min-width: 1180px) {
+  @media (min-width: 73.75em) {
     .header__nav {
       display: block;
     }
@@ -312,7 +313,7 @@ const groups = hoursGroups();
       if ((e.target as HTMLElement).closest('a')) drawer.close();
     });
     // Если окно расширили до десктопа — меню не нужно
-    matchMedia('(min-width: 1180px)').addEventListener('change', (e) => {
+    matchMedia('(min-width: 73.75em)').addEventListener('change', (e) => {
       if (e.matches && drawer.open) drawer.close();
     });
   }

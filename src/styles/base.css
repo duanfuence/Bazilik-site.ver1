@@ -29,6 +29,7 @@ body {
   font-size: var(--fs-body);
   line-height: var(--lh-body);
   font-feature-settings: 'kern', 'liga';
+  overflow-wrap: anywhere; /* слово длиннее строки (крупный шрифт, узкий экран) переносится, а не распирает страницу */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: clip; /* страховка от случайной горизонтальной прокрутки */
@@ -67,7 +68,7 @@ a {
   line-height: var(--lh-head);
   letter-spacing: -0.01em;
   text-wrap: balance;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   hyphens: auto;
 }
 p {
@@ -118,6 +119,17 @@ p {
 }
 
 /* ---------- Раскладка ---------- */
+/*
+ * Крупный шрифт в настройках браузера: элементы сеток могут сжиматься уже своего
+ * содержимого, а длинные слова в крупных заголовках — переноситься, а не распирать страницу.
+ */
+:where(.grid, [class*='__grid'], .intro, .contacts, .chef-hero, .practice, .booking, .mlist, .form__row) > * {
+  min-width: 0;
+}
+:where(.h-mega, .h-display, .h1, .h2, .h3) {
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
 .wrap {
   width: 100%;
   max-width: var(--max);

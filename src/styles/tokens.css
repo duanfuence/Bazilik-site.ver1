@@ -58,7 +58,8 @@
 
   /* Сетка и ритм */
   --gutter: clamp(1rem, 0.4rem + 3vw, 3.5rem);
-  --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  /* 11 промежутков сетки не шире четверти экрана даже при крупном шрифте */
+  --col-gap: min(clamp(1rem, 0.6rem + 1.6vw, 2rem), 2.5vw);
   --max: 1560px;
   --measure: 38rem;
   --space-1: 0.5rem;

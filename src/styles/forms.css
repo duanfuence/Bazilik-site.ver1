@@ -195,7 +195,7 @@ select.input {
 /* Согласие */
 .check {
   display: grid;
-  grid-template-columns: 1.4rem 1fr;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
   gap: 0.75rem;
   align-items: start;
   font-size: 0.9rem;

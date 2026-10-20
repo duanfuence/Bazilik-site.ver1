@@ -14,9 +14,14 @@ interface Props {
   items: (MenuItem & { kicker?: string })[];
   /** Уровень заголовка позиции: h3 на главной, h4 внутри раздела меню */
   itemHeading?: 'h3' | 'h4';
+  /**
+   * Подогнать ленту под высоту экрана: кадры масштабируются от --strip-h,
+   * которую задаёт родитель (высота самого высокого кадра), описания — в две строки.
+   */
+  fit?: boolean;
 }
 
-const { id, label, items, itemHeading = 'h3' } = Astro.props;
+const { id, label, items, itemHeading = 'h3', fit = false } = Astro.props;
 const ItemHeading = itemHeading;
 
 // Ритм коллажа повторяется каждые 5 кадров: высокий, малый ниже, широкий, узкий, квадрат.
@@ -32,7 +37,7 @@ const trackId = `strip-${id}`;
 const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
 ---
 
-<div class="strip" data-strip>
+<div class:list={['strip', { 'strip--fit': fit }]} data-strip>
   <div class="strip__bar wrap">
     <p class="strip__hint muted" aria-hidden="true">Листайте вправо</p>
     <div class="strip__controls">
@@ -84,6 +89,7 @@ const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
   }
   .strip__bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
@@ -99,7 +105,7 @@ const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
   }
   .strip__progress {
     position: relative;
-    width: clamp(4rem, 10vw, 9rem);
+    width: clamp(2.5rem, 10vw, 9rem);
     height: 1px;
     margin-right: 0.75rem;
     background: var(--line-strong);
@@ -149,11 +155,12 @@ const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
     gap: clamp(1rem, 0.5rem + 2vw, 2.5rem);
     list-style: none;
     margin: 0;
-    padding: 0.5rem var(--inset) 1.5rem;
+    /* поля ленты можно переопределить снаружи (--strip-inset-start/end), например в развороте на главной */
+    padding: 0.5rem var(--strip-inset-end, var(--inset)) 1.5rem var(--strip-inset-start, var(--inset));
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x proximity;
-    scroll-padding-inline: var(--inset);
+    scroll-padding-inline: var(--strip-inset-start, var(--inset)) var(--strip-inset-end, var(--inset));
     scrollbar-width: none;
   }
   .strip__track::-webkit-scrollbar {
@@ -172,6 +179,32 @@ const tones: Tone[] = ['clay', 'olive', 'paper', 'tomato', 'ink'];
   .strip__item--c { width: clamp(17rem, 80vw, 34rem); margin-top: clamp(1rem, 2vw, 2rem); }
   .strip__item--d { width: clamp(13rem, 58vw, 21rem); margin-top: clamp(4rem, 9vw, 9rem); }
   .strip__item--e { width: clamp(12rem, 50vw, 18rem); }
+
+  /* Режим «под экран»: та же ритмика коллажа, но размеры — доли --strip-h */
+  .strip--fit .strip__item--a { width: min(clamp(15rem, 68vw, 26rem), calc(var(--strip-h) * 0.8)); }
+  .strip--fit .strip__item--b { width: min(clamp(12rem, 52vw, 19rem), calc(var(--strip-h) * 0.7)); margin-top: calc(var(--strip-h) * 0.15); }
+  .strip--fit .strip__item--c { width: min(clamp(17rem, 80vw, 34rem), calc(var(--strip-h) * 1.1)); margin-top: calc(var(--strip-h) * 0.08); }
+  .strip--fit .strip__item--d { width: min(clamp(13rem, 58vw, 21rem), calc(var(--strip-h) * 0.6)); margin-top: calc(var(--strip-h) * 0.2); }
+  .strip--fit .strip__item--e { width: min(clamp(12rem, 50vw, 18rem), calc(var(--strip-h) * 0.65)); }
+  .strip--fit .strip__item {
+    min-width: 10rem;
+  }
+  .strip--fit .strip__desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .strip--fit .strip__name {
+    font-size: min(clamp(1.35rem, 1.15rem + 0.7vw, 1.8rem), max(1.2rem, 3.2vh));
+  }
+  /* На невысоких экранах — только названия и цены: состав есть в полном меню */
+  @media (min-width: 900px) and (max-height: 820px) {
+    .strip--fit .strip__desc {
+      display: none;
+    }
+  }
 
   .strip__meta {
     display: grid;
